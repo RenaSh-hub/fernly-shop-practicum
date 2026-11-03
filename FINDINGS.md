@@ -1,0 +1,53 @@
+# Fernly findings
+
+One entry per proven issue, ordered by severity: money and privacy first, then broken flows, then everything else. A finding needs evidence: a failing test, or exact steps and requests. Until then it stays under "Suspicions — not yet tested".
+
+The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
+
+## Entry format
+
+```markdown
+### F-NN: <one-line title: what is wrong>
+
+- **Where:** <page, component, or endpoint>
+- **Category:** <Components | Pages | Business rules in the API | The contract | Caching | Authorization | Accessibility>
+- **Impact:** <the impact on a customer, in one sentence>
+- **Evidence:** <the test that fails (file and test name), or the exact steps and requests>
+- **Contradicts:** <the line in docs/PRODUCT.md or the API contract>
+- **Suggested fix (optional):** <one line>
+```
+
+## Findings
+
+None yet. Nothing below has been proven by a test.
+
+## Suspicions — not yet tested
+
+Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
+
+- **Signing out leaves a viewed order in the data cache:** `signOut` clears the `['cart']` and `['orders']` queries but not `['order', id]` (`AuthContext.tsx`, `queries.ts`), so the next customer on the same device may briefly see the previous customer's order. May contradict L49: "An order is private: only the customer who placed it can see it." and L55: "Signing out forgets the session on this device."
+- **Prices are not shown with two decimals:** cards show `$22`, `$27.5`, `$12.5`; the plant page shows `$16.5` and `+$4`; the cart shows `$25`. `formatPrice` rounds but never pads (`money.ts`). May contradict L31: "Every price is shown in dollars with two decimals, everywhere: `$12.50`, never `$12.5`."
+- **The + button stays enabled at the stock limit:** String of Pearls has 1 in stock, and + took the quantity to 2; `QuantityStepper` disables + only when `value > max`. The same stepper is used on cart lines. May contradict L34: "Quantity … can never go above the stock left: at the stock limit, the + button is disabled." and L41: "A line can never hold more than the plant's stock."
+- **The plant page shows the previous plant after a "Likes the same light" link:** from String of Pearls, clicking Fiddle Leaf Fig changed the address to `/plants/pl-fiddle` but the heading still read "String of Pearls" (and quantity stayed at 2); `usePlant` caches under `['plant']` without the id. May contradict L35: "The plant page always shows the plant in the address bar, including after following a 'Likes the same light' link."
+- **"Price: high to low" lists the cheapest plant first:** the UI and `GET /api/plants?sort=price-desc` both start Succulent Cutting $0.99, Aloe Vera $9.99, the same as `price-asc`. May contradict L25: "Price: high to low (most expensive first)" and the contract's "price-desc (highest first)".
+- **Care level 3 is labelled "Moderate":** the API gives `careLevel: 3` for Fiddle Leaf Fig, Calathea, String of Pearls and the Thai Constellation Monstera, but the badge says "Moderate care" (three dots); `CareLevelBadge` caps the index at `LABELS.length - 1` before subtracting 1. May contradict L32: "Care level has three steps: 1 Easy, 2 Moderate, 3 Expert."
+- **A catalog error looks like an empty result:** `BrowsePage` renders "No plants match your filters" for both `isError` and no items, with no Try again. May contradict L27: "If the catalog can't be loaded, the page says so and offers Try again. It never pretends there are no plants."
+- **The plant page's main image has no alternative text:** the hero `<img>` on `/plants/:plantId` has no `alt` attribute. May contradict L62: "every meaningful image has alternative text".
+- **The save (heart) buttons on plant cards have no name:** each is a `<button aria-pressed>` with only an `aria-hidden` SVG, so the accessibility tree shows an unnamed button. May contradict L61: "every button and form field has a name a screen reader can announce".
+- **The search field has no name:** the `<input type="search">` has no label or `aria-label`; "Search plants" is a separate visual hint that disappears on typing. May contradict L61: "every button and form field has a name a screen reader can announce".
+- **The search field hides its keyboard focus:** `SearchBox.module.css` sets `outline: none` on the input and nothing replaces it. May contradict L64: "everything works with the keyboard alone, and focus is always visible."
+- **Prices have low contrast:** the large price on the plant page is `rgb(141, 187, 138)` on `rgb(246, 250, 243)`, about 2.07:1 (measured); other prices use the same green. May contradict L63: "text has enough contrast against its background (4.5:1 for normal text)".
+
+## Questions — neither document answers
+
+- On the cart page in the browser's default narrow tab (627 px wide) the cart line's + button is clipped by its 64 px stepper box (`overflow: hidden`). Is a narrow window in scope, and should a line's quantity be raisable from the cart?
+- A paid order (`/orders/:id`, $25 subtotal) still shows "Add $25 more for free shipping." Should the hint appear on a placed order?
+- Checkout shows the API's raw validation text (`shippingAddress.fullName: fullName must not be empty; …`) in one banner instead of per field. What message should a customer see?
+- ZZ Plant's image is `snake.svg`, the same picture as Snake Plant. Is that intended?
+- The contract caps a cart quantity at 20, but some plants have more stock (Succulent Cutting: 40). Which limit should the shop enforce?
+- `/login` still shows the form to a signed-in customer. Should it redirect?
+- `GET /api/orders` is requested even while signed out (and gets 401). Harmless, or should it wait for sign-in?
+
+## Checked and consistent so far (not tests)
+
+Quick API and browser checks that matched PRODUCT.md, so they are lower priority: search ignores case (`MONSTERA`, `FICUS`); Low + Bright light gives 14 = 6 + 8; pet-safe returns only pet-safe plants; 21 plants in pages of 12 and 9; signed-out Add to cart and `/cart` both go to sign-in; a $25 cart charges $6.95 shipping; placing an order empties the cart and lists the order.
