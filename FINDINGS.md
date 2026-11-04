@@ -19,7 +19,14 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 
 ## Findings
 
-None yet. Nothing below has been proven by a test.
+### F-01: The + button stays enabled at the stock limit
+
+- **Where:** `QuantityStepper` (`QuantityStepper.tsx`); used on the plant page and cart lines via `CartLine`.
+- **Category:** Components
+- **Impact:** When quantity already equals stock, + stays clickable, so the shop looks like it allows more than is available until the API refuses it.
+- **Evidence:** `web/cypress/component/QuantityStepper.cy.tsx` — test **disables + at the stock limit** (fails: + is enabled when `value={3}` and `max={3}`).
+- **Contradicts:** docs/PRODUCT.md L34 — "Quantity … can never go above the stock left: at the stock limit, the **+** button is disabled."; L41 — "A line can never hold more than the plant's stock."
+- **Suggested fix:** Disable + when `value >= max`, not only when `value > max`.
 
 ## Suspicions — not yet tested
 
@@ -27,7 +34,6 @@ Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while m
 
 - **Signing out leaves a viewed order in the data cache:** `signOut` clears the `['cart']` and `['orders']` queries but not `['order', id]` (`AuthContext.tsx`, `queries.ts`), so the next customer on the same device may briefly see the previous customer's order. May contradict L49: "An order is private: only the customer who placed it can see it." and L55: "Signing out forgets the session on this device."
 - **Prices are not shown with two decimals:** cards show `$22`, `$27.5`, `$12.5`; the plant page shows `$16.5` and `+$4`; the cart shows `$25`. `formatPrice` rounds but never pads (`money.ts`). May contradict L31: "Every price is shown in dollars with two decimals, everywhere: `$12.50`, never `$12.5`."
-- **The + button stays enabled at the stock limit:** String of Pearls has 1 in stock, and + took the quantity to 2; `QuantityStepper` disables + only when `value > max`. The same stepper is used on cart lines. May contradict L34: "Quantity … can never go above the stock left: at the stock limit, the + button is disabled." and L41: "A line can never hold more than the plant's stock."
 - **The plant page shows the previous plant after a "Likes the same light" link:** from String of Pearls, clicking Fiddle Leaf Fig changed the address to `/plants/pl-fiddle` but the heading still read "String of Pearls" (and quantity stayed at 2); `usePlant` caches under `['plant']` without the id. May contradict L35: "The plant page always shows the plant in the address bar, including after following a 'Likes the same light' link."
 - **"Price: high to low" lists the cheapest plant first:** the UI and `GET /api/plants?sort=price-desc` both start Succulent Cutting $0.99, Aloe Vera $9.99, the same as `price-asc`. May contradict L25: "Price: high to low (most expensive first)" and the contract's "price-desc (highest first)".
 - **Care level 3 is labelled "Moderate":** the API gives `careLevel: 3` for Fiddle Leaf Fig, Calathea, String of Pearls and the Thai Constellation Monstera, but the badge says "Moderate care" (three dots); `CareLevelBadge` caps the index at `LABELS.length - 1` before subtracting 1. May contradict L32: "Care level has three steps: 1 Easy, 2 Moderate, 3 Expert."
