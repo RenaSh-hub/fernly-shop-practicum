@@ -33,7 +33,7 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Where:** `formatPrice` (`web/src/money.ts`); every `PriceTag` and other callers.
 - **Category:** Components
 - **Impact:** Customers see `$12.5`, `$22`, and `$50` instead of `$12.50`, `$22.00`, and `$50.00`, which looks inconsistent and contradicts the shop’s stated formatting rule.
-- **Evidence:** `web/cypress/component/PriceTag.cy.tsx` — **executed**, 11 failing tests (PT-01, PT-02, PT-04, PT-06, PT-08, PT-09, PT-10, PT-12, PT-13, PT-14, PT-15): DOM shows e.g. `$12.5` when the test expects `$12.50`. `web/cypress/ui/browse.cy.ts` — **executed**, test **shows $0.00 when a plant is priced at zero** (DOM shows `$0`).
+- **Evidence:** `web/cypress/component/PriceTag.cy.tsx` — **executed**, 11 failing tests (PT-01, PT-02, PT-04, PT-06, PT-08, PT-09, PT-10, PT-12, PT-13, PT-14, PT-15): DOM shows e.g. `$12.5` when the test expects `$12.50`. `web/cypress/component/SizePicker.cy.tsx` — **executed**, tests **SP-07: Medium option includes +$6.00**, **SP-08: Large option includes +$14.00**, **SP-17: each radio name includes long label and price line** (accessible names show `Medium +$6` and `Large +$14` instead of `+$6.00` / `+$14.00`). `web/cypress/ui/browse.cy.ts` — **executed**, test **shows $0.00 when a plant is priced at zero** (DOM shows `$0`).
 - **Contradicts:** docs/PRODUCT.md L31 — "Every price is shown in dollars with **two decimals**, everywhere: `$12.50`, never `$12.5`."
 - **Suggested fix:** Format cents with fixed two fractional digits after rounding (e.g. `toFixed(2)` on the rounded dollar amount).
 
