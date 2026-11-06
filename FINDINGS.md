@@ -60,7 +60,7 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Where:** `PlantCard` (`PlantCard.tsx`).
 - **Category:** Accessibility
 - **Impact:** Screen reader users hear an unnamed control and cannot tell what the heart button does.
-- **Evidence:** `web/cypress/component/PlantCard.cy.tsx` — **executed**, tests **PC-23: save button has a name when unsaved**, **PC-24: save button has a name when saved** (accessible role `button` with Name `""`).
+- **Evidence:** `web/cypress/component/PlantCard.cy.tsx` — **executed**, tests **PC-23: save button has a name when unsaved**, **PC-24: save button has a name when saved** (accessible role `button` with Name `""`). `tests/a11y/pages.spec.ts` — **executed**, test **Browse (/) @a11y** reports blocking `button-name` on each card’s save control (matches `.PlantCard-module__save`).
 - **Contradicts:** docs/PRODUCT.md L61 — "every button and form field has a name a screen reader can announce".
 - **Suggested fix:** Add visible text, `aria-label`, or `aria-labelledby` so the button’s accessible name describes save/unsaved state.
 
@@ -69,7 +69,7 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Where:** `SearchBox` (`SearchBox.tsx`).
 - **Category:** Accessibility
 - **Impact:** The main browse search is exposed as a searchbox with no name; the visual hint is not programmatically associated with the input.
-- **Evidence:** `web/cypress/component/SearchBox.cy.tsx` — **executed**, tests **SB-15: search field named Search plants when empty**, **SB-16: search field named Search plants when filled** (accessibility tree: searchbox with Name `""`).
+- **Evidence:** `web/cypress/component/SearchBox.cy.tsx` — **executed**, tests **SB-15: search field named Search plants when empty**, **SB-16: search field named Search plants when filled** (accessibility tree: searchbox with Name `""`). `tests/a11y/pages.spec.ts` — **executed**, test **Browse (/) @a11y** reports blocking `label` on `.SearchBox-module__input`.
 - **Contradicts:** docs/PRODUCT.md L61 — "every button and form field has a name a screen reader can announce".
 - **Suggested fix:** Use a real `<label htmlFor=…>`, `aria-label`, or `aria-labelledby` tied to the persistent "Search plants" text.
 
@@ -118,15 +118,31 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Contradicts:** docs/PRODUCT.md L25 — "Price: high to low **(most expensive first)**".
 - **Suggested fix:** Fix API ordering for `price-desc` (see F-10).
 
+### F-12: Price text fails WCAG color contrast (axe `color-contrast`)
+
+- **Where:** `PriceTag` and pages that render it (browse grid, plant detail, cart, checkout).
+- **Category:** Accessibility
+- **Impact:** Price text may fall below the minimum contrast ratio for normal text, so some users cannot read amounts reliably.
+- **Evidence:** `tests/a11y/pages.spec.ts` — **executed**, Playwright project **a11y** (`@axe-core/playwright`, tags wcag2a, wcag2aa, wcag21a, wcag21aa): **Browse (/)**, **Plant (/plants/pl-monstera)**, **Cart with one plant in cart**, and **Checkout with one plant in cart** each fail with blocking `color-contrast` (serious) on `PriceTag` nodes; each test attaches `axe-results` (JSON).
+- **Contradicts:** docs/PRODUCT.md L63 — "text has enough contrast against its background (4.5:1 for normal text)".
+- **Suggested fix:** Raise contrast (darker price color or different surface) until ratio meets 4.5:1; re-run `npx playwright test --project=a11y`.
+
+### F-13: Plant detail hero image has no alternative text
+
+- **Where:** `PlantPage` hero `<img>` (`web/src/pages/PlantPage.tsx`).
+- **Category:** Accessibility
+- **Impact:** Screen reader users hear no description of the main product photo.
+- **Evidence:** `tests/a11y/pages.spec.ts` — **executed**, test **Plant (/plants/pl-monstera) @a11y** reports blocking `image-alt` (critical) on the hero `img` (see `axe-results` attachment).
+- **Contradicts:** docs/PRODUCT.md L62 — "every meaningful image has alternative text".
+- **Suggested fix:** Add a descriptive `alt` (e.g. plant name + product image), or mark decorative images with `alt=""` if appropriate.
+
 ## Suspicions — not yet tested
 
 Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
 
 - **Signing out leaves a viewed order in the data cache:** `signOut` clears the `['cart']` and `['orders']` queries but not `['order', id]` (`AuthContext.tsx`, `queries.ts`), so the next customer on the same device may briefly see the previous customer's order. May contradict L49: "An order is private: only the customer who placed it can see it." and L55: "Signing out forgets the session on this device."
 - **The plant page shows the previous plant after a "Likes the same light" link:** from String of Pearls, clicking Fiddle Leaf Fig changed the address to `/plants/pl-fiddle` but the heading still read "String of Pearls" (and quantity stayed at 2); `usePlant` caches under `['plant']` without the id. May contradict L35: "The plant page always shows the plant in the address bar, including after following a 'Likes the same light' link."
-- **The plant page's main image has no alternative text:** the hero `<img>` on `/plants/:plantId` has no `alt` attribute. May contradict L62: "every meaningful image has alternative text".
 - **The search field hides its keyboard focus:** `SearchBox.module.css` sets `outline: none` on the input and nothing replaces it. May contradict L64: "everything works with the keyboard alone, and focus is always visible."
-- **Prices have low contrast:** the large price on the plant page is `rgb(141, 187, 138)` on `rgb(246, 250, 243)`, about 2.07:1 (measured); other prices use the same green. May contradict L63: "text has enough contrast against its background (4.5:1 for normal text)".
 
 ## Questions — neither document answers
 

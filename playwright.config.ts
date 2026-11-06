@@ -12,6 +12,7 @@ const isCI = !!process.env.CI;
 
 export default defineConfig({
   testDir: './tests',
+  tsconfig: './tsconfig.playwright.json',
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
@@ -53,6 +54,13 @@ export default defineConfig({
     {
       name: 'e2e',
       testMatch: /e2e\/.*\.spec\.ts/,
+      dependencies: ['setup'],
+      use: { baseURL: webUrl },
+    },
+    {
+      name: 'a11y',
+      testDir: './tests/a11y',
+      testMatch: /.*\.spec\.ts/,
       dependencies: ['setup'],
       use: { baseURL: webUrl },
     },
