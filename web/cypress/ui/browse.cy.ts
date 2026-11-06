@@ -23,8 +23,10 @@ describe('Browse page (/)', () => {
     cy.wait('@plants');
 
     cy.findByRole('heading', { name: '0 plants' });
-    cy.findByRole('heading', { name: 'No plants match your filters' });
-    cy.findByText('Try another search or clear a filter.');
+    cy.findByRole('region', { name: '0 plants' }).within(() => {
+      cy.findByRole('heading', { level: 2, name: 'No plants match your filters' });
+      cy.findByText('Try another search or clear a filter.');
+    });
   });
 
   it('keeps a very long plant name inside its card', { tags: '@ui' }, () => {
