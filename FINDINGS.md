@@ -91,13 +91,39 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Contradicts:** docs/PRODUCT.md L59 — "Fernly aims for **WCAG 2.1 level AA** on every page"; L61 — naming for assistive technology.
 - **Suggested fix:** Mirror the ErrorBanner fix: ensure the status region’s accessible name includes the toast text.
 
+### F-09: Plant detail returns `rating` as a string while OpenAPI says number
+
+- **Where:** `GET /api/plants/{plantId}` (`api/src/store.ts`, `getPlant`).
+- **Category:** The contract
+- **Impact:** Clients and contract checks expect a JSON number; a string breaks strict schema validation and type-aware consumers.
+- **Evidence:** `tests/api/plants.spec.ts` — **executed**, test **Plants API › a plant matches the Plant schema @api** fails: `Body does not match schema Plant:\n/rating must be number` (from `tests/helpers/schema.ts` → AJV), because `getPlant` returns `rating` from `plant.rating.toFixed(1)` (string).
+- **Contradicts:** `GET /openapi.json` — `Plant` / `PlantSummary` define `rating` as `number`; same shape in `api/src/schemas.ts`.
+- **Suggested fix:** Return the numeric `rating` from `summary()` in detail responses; format for display only in the web UI.
+
+### F-10: `sort=price-desc` orders ascending like `price-asc`
+
+- **Where:** `GET /api/plants` (`api/src/store.ts`, `listPlants`).
+- **Category:** Business rules in the API
+- **Impact:** “Price: high to low” in the API returns cheapest-first order, contradicting product and OpenAPI text.
+- **Evidence:** `tests/api/plants.spec.ts` — **executed**, test **Plants API › "price-desc" returns the most expensive first @api** fails: `items[0].price should be >= items[1].price` with `Received: 0.99`, `Expected: >= 9.99` for adjacent items, because `listPlants` uses the same ascending sort for `price-desc` as for `price-asc`.
+- **Contradicts:** docs/PRODUCT.md L25 — "Price: high to low **(most expensive first)**"; OpenAPI `/api/plants` description — "price-desc (highest first)".
+- **Suggested fix:** Sort `price-desc` by `b.price - a.price` separately from `price-asc`.
+
+### F-11: Browse shows the cheapest plant first when `price-desc` is broken
+
+- **Where:** Browse page `/` with **Sort by → Price: high to low** (`web/src` + `GET /api/plants?sort=price-desc`).
+- **Category:** Pages
+- **Impact:** Customers believe they sorted most-expensive-first but see the opposite order on the first row.
+- **Evidence:** `tests/e2e/browse.spec.ts` — **executed**, test **Browse › choosing "Price: high to low" shows the most expensive plant first @e2e** fails: first card heading is not the most expensive plant (oracle: last item of `GET …/api/plants?sort=price-asc&pageSize=48`) when the API keeps `price-desc` in ascending order.
+- **Contradicts:** docs/PRODUCT.md L25 — "Price: high to low **(most expensive first)**".
+- **Suggested fix:** Fix API ordering for `price-desc` (see F-10).
+
 ## Suspicions — not yet tested
 
 Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
 
 - **Signing out leaves a viewed order in the data cache:** `signOut` clears the `['cart']` and `['orders']` queries but not `['order', id]` (`AuthContext.tsx`, `queries.ts`), so the next customer on the same device may briefly see the previous customer's order. May contradict L49: "An order is private: only the customer who placed it can see it." and L55: "Signing out forgets the session on this device."
 - **The plant page shows the previous plant after a "Likes the same light" link:** from String of Pearls, clicking Fiddle Leaf Fig changed the address to `/plants/pl-fiddle` but the heading still read "String of Pearls" (and quantity stayed at 2); `usePlant` caches under `['plant']` without the id. May contradict L35: "The plant page always shows the plant in the address bar, including after following a 'Likes the same light' link."
-- **"Price: high to low" lists the cheapest plant first:** the UI and `GET /api/plants?sort=price-desc` both start Succulent Cutting $0.99, Aloe Vera $9.99, the same as `price-asc`. May contradict L25: "Price: high to low (most expensive first)" and the contract's "price-desc (highest first)".
 - **The plant page's main image has no alternative text:** the hero `<img>` on `/plants/:plantId` has no `alt` attribute. May contradict L62: "every meaningful image has alternative text".
 - **The search field hides its keyboard focus:** `SearchBox.module.css` sets `outline: none` on the input and nothing replaces it. May contradict L64: "everything works with the keyboard alone, and focus is always visible."
 - **Prices have low contrast:** the large price on the plant page is `rgb(141, 187, 138)` on `rgb(246, 250, 243)`, about 2.07:1 (measured); other prices use the same green. May contradict L63: "text has enough contrast against its background (4.5:1 for normal text)".
