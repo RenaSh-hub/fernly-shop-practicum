@@ -19,23 +19,23 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 
 ## Findings
 
-### F-01: The + button stays enabled at the stock limit
-
-- **Where:** `QuantityStepper` (`QuantityStepper.tsx`); used on the plant page and cart lines via `CartLine`.
-- **Category:** Components
-- **Impact:** When quantity already equals stock, + stays clickable, so the shop looks like it allows more than is available until the API refuses it.
-- **Evidence:** `web/cypress/component/QuantityStepper.cy.tsx` — **executed**, tests **QS-05: + disabled at stock limit**, **QS-08: + disabled when only one unit in stock**, **QS-11: + at max does not call onChange**, **QS-12: readout 20 and + disabled at API max** (+ stays enabled when `value === max`). `web/cypress/component/CartLine.cy.tsx` — **executed**, tests **CL-12: + disabled at stock limit**, **CL-14: quantity and stock both 1 — stepper disabled, Remove enabled**, **CL-15: quantity 20 at stock 20 — output 20 and + disabled** (+ stays enabled when `quantity === stock`). Screenshots under `web/cypress/screenshots/CartLine.cy.tsx/`.
-- **Contradicts:** docs/PRODUCT.md L34 — "Quantity … can never go above the stock left: at the stock limit, the **+** button is disabled."; L41 — "A line can never hold more than the plant's stock."
-- **Suggested fix:** Disable + when `value >= max`, not only when `value > max`.
-
-### F-02: Prices are not shown with two decimals
+### F-01: Prices are not shown with two decimals
 
 - **Where:** `formatPrice` (`web/src/money.ts`); every `PriceTag` and other callers.
 - **Category:** Components
 - **Impact:** Customers see `$12.5`, `$22`, and `$50` instead of `$12.50`, `$22.00`, and `$50.00`, which looks inconsistent and contradicts the shop’s stated formatting rule.
-- **Evidence:** `web/cypress/component/PriceTag.cy.tsx` — **executed**, 11 failing tests (PT-01, PT-02, PT-04, PT-06, PT-08, PT-09, PT-10, PT-12, PT-13, PT-14, PT-15): DOM shows e.g. `$12.5` when the test expects `$12.50`. `web/cypress/component/CartLine.cy.tsx` — **executed**, tests **CL-05: unit price $30.50 and each** (DOM `$30.5`), **CL-07: line total $61.00** (`$61`), **CL-08: $24.50 each and $99.00 line total** (`$24.5`, `$99`), **CL-09: zero money shows $0.00** (`$0`). Screenshots under `web/cypress/screenshots/CartLine.cy.tsx/`. `web/cypress/component/SizePicker.cy.tsx` — **executed**, tests **SP-07: Medium option includes +$6.00**, **SP-08: Large option includes +$14.00**, **SP-17: each radio name includes long label and price line** (accessible names show `Medium +$6` and `Large +$14` instead of `+$6.00` / `+$14.00`). `web/cypress/ui/browse.cy.ts` — **executed**, test **shows $0.00 when a plant is priced at zero** (DOM shows `$0`). `web/cypress/ui/plant.cy.ts` — **executed**, test **shows $0.00 when the plant base price is zero** (DOM shows `$0` when the mocked plant detail has `"price": 0`). `web/cypress/ui/cart.cy.ts` — **executed**, test **shows $0.00 when a line unit price and line total are zero** (each and line total show `$0`). Screenshot: `web/cypress/screenshots/cart.cy.ts/Cart page (cart) -- shows $0.00 when a line unit price and line total are zero (failed).png`. `web/cypress/ui/orders.cy.ts` — **executed**, test **shows $0.00 when an order total is zero** (list row shows `$0`). Screenshot: `web/cypress/screenshots/orders.cy.ts/Orders page (orders) -- shows $0.00 when an order total is zero (failed).png`. `web/cypress/component/PlantCard.cy.tsx` — **executed**, tests **PC-05: price shows $24.50**, **PC-06: whole-dollar price $22.00**, **PC-07: zero price $0.00** (DOM shows `$24.5`, `$22`, `$0`). `web/cypress/component/OrderSummary.cy.tsx` — **executed**, tests **OS-06: subtotal amount is $25.00** (DOM `$25`), **OS-10: empty cart shipping is $0.00, not Free** (shipping `$0`), **OS-12: hint Add $25.00 more for free shipping** (hint uses `$25`), **OS-13: hint Add $50.00 more for free shipping** (hint uses `$50`), **OS-19: total is $99.00** (total `$99`). Screenshots under `web/cypress/screenshots/OrderSummary.cy.tsx/`.
+- **Evidence:** `web/cypress/component/PriceTag.cy.tsx` — **executed**, tests **PT-01: shows $12.50 for amount 12.5**, **PT-02: shows $22.00 for whole dollars**, **PT-04: shows $0.00 for zero**, **PT-06: shows $50.00 at the free-shipping threshold**, **PT-09: shows the price with no screen-reader prefix**, **PT-10: includes hidden Price: before $12.50**, **PT-12: includes hidden Line total:**, **PT-13: shows $12.50 at size sm**, **PT-14: shows $12.50 at the default size**, **PT-15: shows $99.00 at size lg**: DOM shows amounts without required trailing zeros (e.g. `$12.5`). `web/cypress/component/CartLine.cy.tsx` — **executed**, tests **CL-05: unit price $30.50 and each**, **CL-07: line total $61.00**, **CL-08: $24.50 each and $99.00 line total**, **CL-09: zero money shows $0.00**. `web/cypress/component/SizePicker.cy.tsx` — **executed**, tests **SP-07: Medium option includes +$6.00**, **SP-08: Large option includes +$14.00**, **SP-17: each radio name includes long label and price line**. `web/cypress/ui/browse.cy.ts` — **executed**, test **shows $0.00 when a plant is priced at zero**. `web/cypress/ui/plant.cy.ts` — **executed**, test **shows $0.00 when the plant base price is zero**. `web/cypress/ui/cart.cy.ts` — **executed**, test **shows $0.00 when a line unit price and line total are zero**. `web/cypress/ui/orders.cy.ts` — **executed**, test **shows $0.00 when an order total is zero**. `web/cypress/component/PlantCard.cy.tsx` — **executed**, tests **PC-05: price shows $24.50**, **PC-06: whole-dollar price $22.00**, **PC-07: zero price $0.00**. `web/cypress/component/OrderSummary.cy.tsx` — **executed**, tests **OS-06: subtotal amount is $25.00**, **OS-10: empty cart shipping is $0.00, not Free**, **OS-12: hint Add $25.00 more for free shipping**, **OS-13: hint Add $50.00 more for free shipping**, **OS-19: total is $99.00**.
 - **Contradicts:** docs/PRODUCT.md L31 — "Every price is shown in dollars with **two decimals**, everywhere: `$12.50`, never `$12.5`."
 - **Suggested fix:** Format cents with fixed two fractional digits after rounding (e.g. `toFixed(2)` on the rounded dollar amount).
+
+### F-02: The + button stays enabled at the stock limit
+
+- **Where:** `QuantityStepper` (`QuantityStepper.tsx`); used on the plant page and cart lines via `CartLine`.
+- **Category:** Components
+- **Impact:** When quantity already equals stock, + stays clickable, so the shop looks like it allows more than is available until the API refuses it.
+- **Evidence:** `web/cypress/component/QuantityStepper.cy.tsx` — **executed**, tests **QS-05: + disabled at stock limit**, **QS-08: + disabled when only one unit in stock**, **QS-11: + at max does not call onChange**, **QS-12: readout 20 and + disabled at API max** (+ stays enabled when `value === max`). `web/cypress/component/CartLine.cy.tsx` — **executed**, tests **CL-12: + disabled at stock limit**, **CL-14: quantity and stock both 1 — stepper disabled, Remove enabled**, **CL-15: quantity 20 at stock 20 — output 20 and + disabled** (+ stays enabled when `quantity === stock`).
+- **Contradicts:** docs/PRODUCT.md L34 — "Quantity … can never go above the stock left: at the stock limit, the **+** button is disabled."; L41 — "A line can never hold more than the plant's stock."
+- **Suggested fix:** Disable + when `value >= max`, not only when `value > max`.
 
 ### F-03: A catalog load failure looks like an empty filter result
 
@@ -46,6 +46,51 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Contradicts:** docs/PRODUCT.md L27 — "If the catalog can't be loaded, the page says so and offers **Try again**. It never pretends there are no plants."
 - **Suggested fix:** On `plants.isError`, render `ErrorBanner` with retry (refetch); reserve `EmptyState` for a successful empty `items` list.
 
+### F-04: Care level 3 is labelled "Moderate" instead of "Expert"
+
+- **Where:** `CareLevelBadge` (`CareLevelBadge.tsx`); surfaced on plant cards and elsewhere.
+- **Category:** Components
+- **Impact:** Plants that need expert care are labelled moderate, which misleads customers about how hard a plant is to keep.
+- **Evidence:** `web/cypress/component/CareLevelBadge.cy.tsx` — **executed**, tests **CLB-03: three dots and Expert care at level 3**, **CLB-06: hides dots from assistive tech; name is Expert care** (DOM shows **Moderate care** with three dots when `level={3}`). `web/cypress/component/PlantCard.cy.tsx` — **executed**, test **PC-19: Expert care** (DOM shows **Moderate care** when `careLevel={3}`).
+- **Contradicts:** docs/PRODUCT.md L32 — "Care level has three steps: 1 **Easy**, 2 **Moderate**, 3 **Expert**."
+- **Suggested fix:** Map `level={3}` to the Expert label (and three dots) without capping the level index in a way that collapses 3 onto 2.
+
+### F-05: Save (heart) buttons on plant cards have no accessible name
+
+- **Where:** `PlantCard` (`PlantCard.tsx`).
+- **Category:** Accessibility
+- **Impact:** Screen reader users hear an unnamed control and cannot tell what the heart button does.
+- **Evidence:** `web/cypress/component/PlantCard.cy.tsx` — **executed**, tests **PC-23: save button has a name when unsaved**, **PC-24: save button has a name when saved** (accessible role `button` with Name `""`).
+- **Contradicts:** docs/PRODUCT.md L61 — "every button and form field has a name a screen reader can announce".
+- **Suggested fix:** Add visible text, `aria-label`, or `aria-labelledby` so the button’s accessible name describes save/unsaved state.
+
+### F-06: The search field has no accessible name
+
+- **Where:** `SearchBox` (`SearchBox.tsx`).
+- **Category:** Accessibility
+- **Impact:** The main browse search is exposed as a searchbox with no name; the visual hint is not programmatically associated with the input.
+- **Evidence:** `web/cypress/component/SearchBox.cy.tsx` — **executed**, tests **SB-15: search field named Search plants when empty**, **SB-16: search field named Search plants when filled** (accessibility tree: searchbox with Name `""`).
+- **Contradicts:** docs/PRODUCT.md L61 — "every button and form field has a name a screen reader can announce".
+- **Suggested fix:** Use a real `<label htmlFor=…>`, `aria-label`, or `aria-labelledby` tied to the persistent "Search plants" text.
+
+### F-07: ErrorBanner alerts have no accessible name
+
+- **Where:** `ErrorBanner` in `Feedback` components (`Feedback.tsx` or adjacent).
+- **Category:** Accessibility
+- **Impact:** `role="alert"` regions do not expose the error text as their accessible name, so assistive tech may not announce them usefully.
+- **Evidence:** `web/cypress/component/Feedback.cy.tsx` — **executed**, tests **EB-08: alert named with the order load error**, **EB-10: no buttons when onRetry omitted; alert shows message** (accessible `alert` with Name `""`).
+- **Contradicts:** docs/PRODUCT.md L59 — "Fernly aims for **WCAG 2.1 level AA** on every page"; L61 — control/region naming expectations for assistive technology.
+- **Suggested fix:** Put the message in `aria-labelledby` / `aria-label` on the alert container, or use a pattern where the alert’s accessible name includes the visible message.
+
+### F-08: Toast status regions have no accessible name
+
+- **Where:** `Toast` in `Feedback` components.
+- **Category:** Accessibility
+- **Impact:** Status toasts use `role="status"` but the live message is not the region’s accessible name.
+- **Evidence:** `web/cypress/component/Feedback.cy.tsx` — **executed**, tests **TO-13: status named with the success message**, **TO-14: error tone remains status, not alert** (accessible `status` with Name `""`).
+- **Contradicts:** docs/PRODUCT.md L59 — "Fernly aims for **WCAG 2.1 level AA** on every page"; L61 — naming for assistive technology.
+- **Suggested fix:** Mirror the ErrorBanner fix: ensure the status region’s accessible name includes the toast text.
+
 ## Suspicions — not yet tested
 
 Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
@@ -53,15 +98,9 @@ Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while m
 - **Signing out leaves a viewed order in the data cache:** `signOut` clears the `['cart']` and `['orders']` queries but not `['order', id]` (`AuthContext.tsx`, `queries.ts`), so the next customer on the same device may briefly see the previous customer's order. May contradict L49: "An order is private: only the customer who placed it can see it." and L55: "Signing out forgets the session on this device."
 - **The plant page shows the previous plant after a "Likes the same light" link:** from String of Pearls, clicking Fiddle Leaf Fig changed the address to `/plants/pl-fiddle` but the heading still read "String of Pearls" (and quantity stayed at 2); `usePlant` caches under `['plant']` without the id. May contradict L35: "The plant page always shows the plant in the address bar, including after following a 'Likes the same light' link."
 - **"Price: high to low" lists the cheapest plant first:** the UI and `GET /api/plants?sort=price-desc` both start Succulent Cutting $0.99, Aloe Vera $9.99, the same as `price-asc`. May contradict L25: "Price: high to low (most expensive first)" and the contract's "price-desc (highest first)".
-- **Care level 3 is labelled "Moderate":** the API gives `careLevel: 3` for Fiddle Leaf Fig, Calathea, String of Pearls and the Thai Constellation Monstera, but the badge says "Moderate care" (three dots); `CareLevelBadge` caps the index at `LABELS.length - 1` before subtracting 1. `web/cypress/component/PlantCard.cy.tsx` — **executed**, test **PC-19: Expert care** (DOM shows **Moderate care** when `careLevel={3}`). `web/cypress/component/CareLevelBadge.cy.tsx` — **executed** (Nov 5, 2026 headless: 5 passing, 2 failing), tests **CLB-03: three dots and Expert care at level 3** and **CLB-06: hides dots from assistive tech; name is Expert care** (DOM shows **Moderate care** with three dots when `level={3}`; `findByText('Expert care')` times out). Screenshots: `web/cypress/screenshots/CareLevelBadge.cy.tsx/CareLevelBadge -- render -- CLB-03 three dots and Expert care at level 3 (failed).png`, `web/cypress/screenshots/CareLevelBadge.cy.tsx/CareLevelBadge -- accessibility -- CLB-06 hides dots from assistive tech; name is Expert care (failed).png`. May contradict L32: "Care level has three steps: 1 Easy, 2 Moderate, 3 Expert."
 - **The plant page's main image has no alternative text:** the hero `<img>` on `/plants/:plantId` has no `alt` attribute. May contradict L62: "every meaningful image has alternative text".
-- **The save (heart) buttons on plant cards have no name:** each is a `<button aria-pressed>` with only an `aria-hidden` SVG, so the accessibility tree shows an unnamed button. `web/cypress/component/PlantCard.cy.tsx` — **executed**, tests **PC-23: save button has a name when unsaved** and **PC-24: save button has a name when saved** (accessible role `button` with Name `""`). Screenshots under `web/cypress/screenshots/PlantCard.cy.tsx/`. May contradict L61: "every button and form field has a name a screen reader can announce".
-- **The search field has no name:** the `<input type="search">` has no label or `aria-label`; "Search plants" is a separate visual hint that disappears on typing. `web/cypress/component/SearchBox.cy.tsx` — **executed**, tests **SB-15: search field named Search plants when empty** and **SB-16: search field named Search plants when filled** (accessibility tree: searchbox with Name `""`; visual hint is not associated with the input). Screenshots under `web/cypress/screenshots/SearchBox.cy.tsx/`. May contradict L61: "every button and form field has a name a screen reader can announce".
 - **The search field hides its keyboard focus:** `SearchBox.module.css` sets `outline: none` on the input and nothing replaces it. May contradict L64: "everything works with the keyboard alone, and focus is always visible."
 - **Prices have low contrast:** the large price on the plant page is `rgb(141, 187, 138)` on `rgb(246, 250, 243)`, about 2.07:1 (measured); other prices use the same green. May contradict L63: "text has enough contrast against its background (4.5:1 for normal text)".
-- **PriceTag drops the trailing zeros PRODUCT.md requires:** `web/cypress/component/PriceTag.cy.tsx` — **executed**. Tests **PT-01: shows $12.50 for amount 12.5** (actual `$12.5`), **PT-02: shows $22.00 for whole dollars** (actual `$22`), **PT-04: shows $0.00 for zero** (actual `$0`), **PT-06: shows $50.00 at the free-shipping threshold** (actual `$50`), **PT-09: shows the price with no screen-reader prefix** (actual `$12.5`), **PT-10: includes hidden Price: before $12.50** (actual `Price: $12.5`; the hidden `Price:` prefix is present), **PT-13: shows $12.50 at size sm** (actual `$12.5`), **PT-14: shows $12.50 at the default size** (actual `$12.5`), **PT-15: shows $99.00 at size lg** (actual `$99`). Screenshots are under `web/cypress/screenshots/PriceTag.cy.tsx/`. May contradict L31: "Every price is shown in dollars with **two decimals**, everywhere: `$12.50`, never `$12.5`."
-- **ErrorBanner alerts have no accessible name:** the message sits in a child `<span>`, so `role="alert"` is exposed with Name `""` even though the text is visible. `web/cypress/component/Feedback.cy.tsx` — **executed**, tests **EB-08: alert named with the order load error** and **EB-10: no buttons when onRetry omitted; alert shows message** (accessible `alert` with Name `""`; message only in the tree as static text inside the alert). Screenshots under `web/cypress/screenshots/Feedback.cy.tsx/`. May contradict L59–L61: WCAG AA and "every button and form field has a name" (live regions should announce their message as the region name).
-- **Toast status regions have no accessible name:** same pattern as `ErrorBanner` — message in a `<span>`, so `role="status"` has Name `""`. `web/cypress/component/Feedback.cy.tsx` — **executed**, tests **TO-13: status named with the success message** and **TO-14: error tone remains status, not alert** (accessible `status` with Name `""`). Screenshots under `web/cypress/screenshots/Feedback.cy.tsx/`. May contradict L59–L61: WCAG AA.
 
 ## Questions — neither document answers
 

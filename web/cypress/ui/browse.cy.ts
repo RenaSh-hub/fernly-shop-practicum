@@ -43,7 +43,7 @@ describe('Browse page (/)', () => {
     });
   });
 
-  it('shows $0.00 when a plant is priced at zero', { tags: '@ui' }, () => {
+  it('shows $0.00 when a plant is priced at zero', { tags: ['@ui', '@known-bug'] }, () => {
     cy.intercept('GET', '/api/plants?*', { fixture: 'plants/browse-price-zero.json' }).as('plants');
     cy.visit('/');
     cy.wait('@plants');
@@ -52,7 +52,7 @@ describe('Browse page (/)', () => {
     cy.findByText('$0.00');
   });
 
-  it('shows an error alert with Try again when the catalog request fails', { tags: '@ui' }, () => {
+  it('shows an error alert with Try again when the catalog request fails', { tags: ['@ui', '@known-bug'] }, () => {
     cy.intercept('GET', '/api/plants?*', {
       statusCode: 500,
       fixture: 'plants/browse-server-error.json',

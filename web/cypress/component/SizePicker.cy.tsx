@@ -45,13 +45,13 @@ describe('SizePicker', () => {
       radio(/Medium.*Base price/i).should('exist');
     });
 
-    it('SP-07: Medium option includes +$6.00', { tags: '@component' }, () => {
+    it('SP-07: Medium option includes +$6.00', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<SizePicker sizes={threeSizes} value="M" onChange={cy.spy()} />);
 
       radio(/Medium.*\+\$6\.00/).should('exist');
     });
 
-    it('SP-08: Large option includes +$14.00', { tags: '@component' }, () => {
+    it('SP-08: Large option includes +$14.00', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<SizePicker sizes={threeSizes} value="L" onChange={cy.spy()} />);
 
       radio(/Large.*\+\$14\.00/).should('exist');
@@ -228,7 +228,7 @@ describe('SizePicker', () => {
 
     it(
       'SP-17: each radio name includes long label and price line',
-      { tags: '@component' },
+      { tags: ['@component', '@known-bug'] },
       () => {
         cy.mount(<SizePicker sizes={threeSizes} value="S" onChange={cy.spy()} />);
 

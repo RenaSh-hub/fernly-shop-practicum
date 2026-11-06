@@ -240,7 +240,7 @@ describe('Feedback', () => {
     });
 
     describe('accessibility', () => {
-      it('EB-08: alert named with the order load error', { tags: '@component' }, () => {
+      it('EB-08: alert named with the order load error', { tags: ['@component', '@known-bug'] }, () => {
         cy.mount(
           <ErrorBanner message="The order couldn't be loaded." onRetry={cy.spy()} />,
         );
@@ -256,7 +256,7 @@ describe('Feedback', () => {
         cy.findByRole('button', { name: 'Try again' }).should('exist');
       });
 
-      it('EB-10: no buttons when onRetry omitted; alert shows message', { tags: '@component' }, () => {
+      it('EB-10: no buttons when onRetry omitted; alert shows message', { tags: ['@component', '@known-bug'] }, () => {
         cy.mount(<ErrorBanner message="Invalid email or password." />);
 
         cy.findAllByRole('button').should('have.length', 0);
@@ -330,6 +330,8 @@ describe('Feedback', () => {
         const onClose = cy.spy().as('onClose');
         cy.mount(<Toast message="Added 1 × Monstera to your cart." onClose={onClose} />);
 
+        cy.findByText('Added 1 × Monstera to your cart.').should('be.visible');
+
         cy.tick(3999);
 
         cy.get('@onClose').should('not.have.been.called');
@@ -341,6 +343,8 @@ describe('Feedback', () => {
         const onClose = cy.spy().as('onClose');
         cy.mount(<Toast message="Added 1 × Monstera to your cart." onClose={onClose} />);
 
+        cy.findByText('Added 1 × Monstera to your cart.').should('be.visible');
+
         cy.tick(4000);
 
         cy.get('@onClose').should('have.been.calledOnce');
@@ -350,6 +354,8 @@ describe('Feedback', () => {
         cy.clock();
         const onClose = cy.spy().as('onClose');
         cy.mount(<Toast message="Saved." onClose={onClose} duration={0} />);
+
+        cy.findByText('Saved.').should('be.visible');
 
         cy.tick(10000);
 
@@ -361,6 +367,8 @@ describe('Feedback', () => {
         cy.clock();
         const onClose = cy.spy().as('onClose');
         cy.mount(<Toast message="Saved." onClose={onClose} duration={1} />);
+
+        cy.findByText('Saved.').should('be.visible');
 
         cy.tick(1);
 
@@ -387,7 +395,7 @@ describe('Feedback', () => {
     });
 
     describe('accessibility', () => {
-      it('TO-13: status named with the success message', { tags: '@component' }, () => {
+      it('TO-13: status named with the success message', { tags: ['@component', '@known-bug'] }, () => {
         cy.mount(
           <Toast message="Added 1 × Monstera to your cart." onClose={cy.spy()} duration={0} />,
         );
@@ -395,7 +403,7 @@ describe('Feedback', () => {
         cy.findByRole('status', { name: 'Added 1 × Monstera to your cart.' }).should('exist');
       });
 
-      it('TO-14: error tone remains status, not alert', { tags: '@component' }, () => {
+      it('TO-14: error tone remains status, not alert', { tags: ['@component', '@known-bug'] }, () => {
         cy.mount(
           <Toast
             message="Only 3 left in stock."

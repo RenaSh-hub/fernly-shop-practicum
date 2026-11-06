@@ -44,7 +44,7 @@ describe('OrderSummary', () => {
       cy.findByRole('heading', { name: 'Order summary' }).should('not.exist');
     });
 
-    it('OS-06: subtotal amount is $25.00', { tags: '@component' }, () => {
+    it('OS-06: subtotal amount is $25.00', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary {...charged} />);
 
       region('Order summary').within(() => {
@@ -88,19 +88,19 @@ describe('OrderSummary', () => {
       });
     });
 
-    it('OS-12: hint Add $25.00 more for free shipping', { tags: '@component' }, () => {
+    it('OS-12: hint Add $25.00 more for free shipping', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary {...charged} />);
 
       hintParagraph('Add $25.00 more for free shipping.');
     });
 
-    it('OS-13: hint Add $50.00 more for free shipping', { tags: '@component' }, () => {
+    it('OS-13: hint Add $50.00 more for free shipping', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary itemCount={1} subtotal={0} shipping={6.95} total={6.95} />);
 
       hintParagraph('Add $50.00 more for free shipping.');
     });
 
-    it('OS-19: total is $99.00 (not subtotal + shipping)', { tags: '@component' }, () => {
+    it('OS-19: total is $99.00 (not subtotal + shipping)', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary itemCount={1} subtotal={25} shipping={6.95} total={99} />);
 
       region('Order summary').within(() => {
@@ -121,7 +121,7 @@ describe('OrderSummary', () => {
       cy.findByText('$0.00').should('not.exist');
     });
 
-    it('OS-10: empty cart shipping is $0.00, not Free', { tags: '@component' }, () => {
+    it('OS-10: empty cart shipping is $0.00, not Free', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary itemCount={0} subtotal={0} shipping={0} total={0} />);
 
       cy.findByText('Free').should('not.exist');

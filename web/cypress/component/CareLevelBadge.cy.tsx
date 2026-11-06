@@ -20,7 +20,7 @@ describe('CareLevelBadge', () => {
       });
     });
 
-    it('CLB-03: three dots and Expert care at level 3', { tags: '@component' }, () => {
+    it('CLB-03: three dots and Expert care at level 3', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<CareLevelBadge level={3} />);
 
       cy.findByText('Expert care', { exact: true }).should('be.visible');
@@ -51,7 +51,7 @@ describe('CareLevelBadge', () => {
       });
     });
 
-    it('CLB-06: hides dots from assistive tech; name is Expert care', { tags: '@component' }, () => {
+    it('CLB-06: hides dots from assistive tech; name is Expert care', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<CareLevelBadge level={3} />);
 
       cy.findByText('Expert care', { exact: true }).should('be.visible');

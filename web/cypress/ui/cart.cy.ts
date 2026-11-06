@@ -59,7 +59,7 @@ describe('Cart page (/cart)', () => {
     });
   });
 
-  it('shows $0.00 when a line unit price and line total are zero', { tags: '@ui' }, () => {
+  it('shows $0.00 when a line unit price and line total are zero', { tags: ['@ui', '@known-bug'] }, () => {
     cy.intercept('GET', '/api/auth/me', { fixture: 'cart/auth-me.json' }).as('authMe');
     cy.intercept('GET', '/api/cart', { fixture: 'cart/cart-price-zero.json' }).as('cart');
     visitSignedIn('/cart');

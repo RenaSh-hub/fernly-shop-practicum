@@ -84,7 +84,7 @@ describe('CartLine', () => {
       cy.findByRole('listitem').find('img').should('have.attr', 'src', '/plants/snake.svg');
     });
 
-    it('CL-05: unit price $30.50 and each', { tags: '@component' }, () => {
+    it('CL-05: unit price $30.50 and each', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine();
 
       cy.findByText(/\$30\.50/);
@@ -97,13 +97,13 @@ describe('CartLine', () => {
       cy.findByText('$0.99');
     });
 
-    it('CL-07: line total $61.00', { tags: '@component' }, () => {
+    it('CL-07: line total $61.00', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine();
 
       cy.findByText('$61.00');
     });
 
-    it('CL-08: $24.50 each and $99.00 line total', { tags: '@component' }, () => {
+    it('CL-08: $24.50 each and $99.00 line total', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine({ ...defaultLine, unitPrice: 24.5, lineTotal: 99 });
 
       cy.findByText('$24.50');
@@ -128,7 +128,7 @@ describe('CartLine', () => {
   });
 
   describe('boundary', () => {
-    it('CL-09: zero money shows $0.00', { tags: '@component' }, () => {
+    it('CL-09: zero money shows $0.00', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine({ ...defaultLine, unitPrice: 0, lineTotal: 0 });
 
       cy.findByText('Line total:').then(($label) => {
@@ -153,7 +153,7 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-12: + disabled at stock limit', { tags: '@component' }, () => {
+    it('CL-12: + disabled at stock limit', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine({ ...defaultLine, quantity: 3, stock: 3 });
 
       increaseButton().then(($btn) => {
@@ -169,7 +169,7 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-14: quantity and stock both 1 — stepper disabled, Remove enabled', { tags: '@component' }, () => {
+    it('CL-14: quantity and stock both 1 — stepper disabled, Remove enabled', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine({ ...defaultLine, quantity: 1, stock: 1 });
 
       decreaseButton().then(($btn) => {
@@ -183,7 +183,7 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-15: quantity 20 at stock 20 — output 20 and + disabled', { tags: '@component' }, () => {
+    it('CL-15: quantity 20 at stock 20 — output 20 and + disabled', { tags: ['@component', '@known-bug'] }, () => {
       mountCartLine({ ...defaultLine, quantity: 20, stock: 20 });
 
       quantityGroup().within(() => {
