@@ -44,7 +44,7 @@ jobs:
             > plan.md
 
       # A push made with github.token starts no new workflow run.
-      - name: Commit plan and push
+      - name: Commit test plan
         run: |
           git add "docs/test-plans/${{ github.head_ref }}.md"
           git commit -m "Add test plan for ${{ github.head_ref }}"
@@ -96,7 +96,7 @@ jobs:
             > results.md
 
       # A push made with github.token starts no new workflow run.
-      - name: Commit tests and docs and push
+      - name: Commit tests and docs
         run: |
           git add --all -- ':!results.md'
           git commit -m "Add tests and results for ${{ github.head_ref }}"
