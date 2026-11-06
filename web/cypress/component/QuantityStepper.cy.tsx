@@ -57,14 +57,14 @@ describe('QuantityStepper', () => {
   });
 
   describe('state', () => {
-    it('QS-04: − disabled at minimum; + enabled', { tags: '@component' }, () => {
+    it('QS-04: - disabled at minimum; + enabled', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={1} max={5} onChange={cy.spy()} />);
 
-      expectDisabled(decreaseButton(), '− at minimum');
+      expectDisabled(decreaseButton(), '- at minimum');
       expectEnabled(increaseButton(), '+ below max');
     });
 
-    it('QS-05: + disabled at stock limit', { tags: ['@component', '@known-bug'] }, () => {
+    it('QS-05: + disabled at stock limit', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={3} max={3} onChange={cy.spy()} />);
 
       expectDisabled(increaseButton(), '+ at stock limit');
@@ -73,23 +73,23 @@ describe('QuantityStepper', () => {
     it('QS-06: disabled prop disables both buttons', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={2} max={5} disabled onChange={cy.spy()} />);
 
-      expectDisabled(decreaseButton(), '− when disabled');
+      expectDisabled(decreaseButton(), '- when disabled');
       expectDisabled(increaseButton(), '+ when disabled');
     });
 
-    it('QS-07: − disabled at custom min', { tags: '@component' }, () => {
+    it('QS-07: - disabled at custom min', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={2} min={2} max={5} onChange={cy.spy()} />);
 
-      expectDisabled(decreaseButton(), '− at custom min');
+      expectDisabled(decreaseButton(), '- at custom min');
     });
 
-    it('QS-08: + disabled when only one unit in stock', { tags: ['@component', '@known-bug'] }, () => {
+    it('QS-08: + disabled when only one unit in stock', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={1} max={1} onChange={cy.spy()} />);
 
       expectDisabled(increaseButton(), '+ at max 1');
     });
 
-    it('QS-12: readout 20 and + disabled at API max', { tags: ['@component', '@known-bug'] }, () => {
+    it('QS-12: readout 20 and + disabled at API max', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={20} max={20} onChange={cy.spy()} />);
 
       cy.findByRole('group', { name: 'Quantity' })
@@ -101,7 +101,7 @@ describe('QuantityStepper', () => {
     it('QS-13: both buttons disabled when max is 0', { tags: '@component' }, () => {
       cy.mount(<QuantityStepper value={1} max={0} onChange={cy.spy()} />);
 
-      expectDisabled(decreaseButton(), '− at min with zero stock');
+      expectDisabled(decreaseButton(), '- at min with zero stock');
       expectDisabled(increaseButton(), '+ with zero stock');
     });
   });
@@ -116,7 +116,7 @@ describe('QuantityStepper', () => {
       cy.get('@onChange').should('have.been.calledOnceWithExactly', 3);
     });
 
-    it('QS-10: − calls onChange with 1', { tags: '@component' }, () => {
+    it('QS-10: - calls onChange with 1', { tags: '@component' }, () => {
       const onChange = cy.spy().as('onChange');
       cy.mount(<QuantityStepper value={2} max={5} onChange={onChange} />);
 
@@ -125,7 +125,7 @@ describe('QuantityStepper', () => {
       cy.get('@onChange').should('have.been.calledOnceWithExactly', 1);
     });
 
-    it('QS-11: + at max does not call onChange', { tags: ['@component', '@known-bug'] }, () => {
+    it('QS-11: + at max does not call onChange', { tags: '@component' }, () => {
       const onChange = cy.spy().as('onChange');
       cy.mount(<QuantityStepper value={3} max={3} onChange={onChange} />);
 

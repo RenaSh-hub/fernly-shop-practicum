@@ -78,7 +78,7 @@ cy.intercept('GET', '/src/pages/BrowsePage.tsx', { statusCode: 200, body: '...' 
 
 ## 6. Tags
 
-Exactly one level tag per test: `{ tags: '@component' }` or `{ tags: '@ui' }`. A confirmed product bug adds `{ tags: ['@component', '@known-bug'] }` (excluded from the CI gate until fixed).
+Exactly one level tag per test: `{ tags: '@component' }` or `{ tags: '@ui' }`.
 
 ```tsx
 // Good

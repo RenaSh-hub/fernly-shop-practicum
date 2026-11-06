@@ -75,7 +75,7 @@ describe('PlantCard', () => {
       });
     });
 
-    it('PC-05: price shows $24.50', { tags: ['@component', '@known-bug'] }, () => {
+    it('PC-05: price shows $24.50', { tags: '@component' }, () => {
       mountWithSave();
 
       cy.findByText('$24.50').should('be.visible');
@@ -102,7 +102,7 @@ describe('PlantCard', () => {
       cy.findByText('Moderate care').should('be.visible');
     });
 
-    it('PC-19: Expert care', { tags: ['@component', '@known-bug'] }, () => {
+    it('PC-19: Expert care', { tags: '@component' }, () => {
       mountWithSave({ ...defaultPlant, careLevel: 3 });
 
       cy.findByText('Expert care').should('be.visible');
@@ -122,13 +122,13 @@ describe('PlantCard', () => {
   });
 
   describe('boundary', () => {
-    it('PC-06: whole-dollar price $22.00', { tags: ['@component', '@known-bug'] }, () => {
+    it('PC-06: whole-dollar price $22.00', { tags: '@component' }, () => {
       mountWithSave({ ...defaultPlant, price: 22 });
 
       cy.findByText('$22.00').should('be.visible');
     });
 
-    it('PC-07: zero price $0.00', { tags: ['@component', '@known-bug'] }, () => {
+    it('PC-07: zero price $0.00', { tags: '@component' }, () => {
       mountWithSave({ ...defaultPlant, price: 0 });
 
       cy.findByText('$0.00').should('be.visible');
@@ -211,13 +211,13 @@ describe('PlantCard', () => {
       cy.findAllByRole('button').should('have.length', 0);
     });
 
-    it('PC-23: save button has a name when unsaved', { tags: ['@component', '@known-bug'] }, () => {
+    it('PC-23: save button has a name when unsaved', { tags: '@component' }, () => {
       mountWithSave(defaultPlant, { saved: false });
 
       cy.findByRole('button', { name: /./ }).should('exist');
     });
 
-    it('PC-24: save button has a name when saved', { tags: ['@component', '@known-bug'] }, () => {
+    it('PC-24: save button has a name when saved', { tags: '@component' }, () => {
       mountWithSave(defaultPlant, { saved: true });
 
       cy.findByRole('button', { name: /./ }).should('exist');

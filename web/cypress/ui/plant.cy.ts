@@ -38,7 +38,7 @@ describe('Plant page (/plants/:plantId)', () => {
     });
   });
 
-  it('shows $0.00 when the plant base price is zero', { tags: ['@ui', '@known-bug'] }, () => {
+  it('shows $0.00 when the plant base price is zero', { tags: '@ui' }, () => {
     cy.intercept('GET', `/api/plants/${PLANT_PRICE_ZERO}`, { fixture: 'plants/plant-detail-price-zero.json' }).as('plant');
     cy.intercept('GET', '/api/plants?*', { fixture: 'plants/plant-detail-all-empty.json' }).as('plants');
     cy.visit(`/plants/${PLANT_PRICE_ZERO}`);

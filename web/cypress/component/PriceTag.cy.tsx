@@ -16,14 +16,14 @@ function priceNode(content: string, element: Element | null): boolean {
 
 describe('PriceTag', () => {
   describe('two-decimal formatting', () => {
-    it('PT-01: shows $12.50 for amount 12.5', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-01: shows $12.50 for amount 12.5', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={12.5} />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$12.50');
       });
     });
 
-    it('PT-02: shows $22.00 for whole dollars', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-02: shows $22.00 for whole dollars', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={22} />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$22.00');
@@ -37,7 +37,7 @@ describe('PriceTag', () => {
       });
     });
 
-    it('PT-04: shows $0.00 for zero', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-04: shows $0.00 for zero', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={0} />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$0.00');
@@ -51,7 +51,7 @@ describe('PriceTag', () => {
       });
     });
 
-    it('PT-06: shows $50.00 at the free-shipping threshold', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-06: shows $50.00 at the free-shipping threshold', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={50} />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$50.00');
@@ -60,14 +60,14 @@ describe('PriceTag', () => {
   });
 
   describe('label', () => {
-    it('PT-09: shows the price with no screen-reader prefix', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-09: shows the price with no screen-reader prefix', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={12.5} />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'price text with no screen-reader prefix').to.equal('$12.50');
       });
     });
 
-    it('PT-10: includes hidden Price: before $12.50', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-10: includes hidden Price: before $12.50', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={12.5} label="Price" />);
       cy.findByText('Price:').then(($prefix) => {
         expect(normalizedText($prefix), 'hidden prefix').to.equal('Price:');
@@ -84,7 +84,7 @@ describe('PriceTag', () => {
       });
     });
 
-    it('PT-12: includes hidden Line total:', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-12: includes hidden Line total:', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={42} label="Line total" />);
       cy.findByText('Line total:').then(($prefix) => {
         expect(normalizedText($prefix), 'hidden prefix').to.equal('Line total:');
@@ -93,21 +93,21 @@ describe('PriceTag', () => {
   });
 
   describe('size', () => {
-    it('PT-13: shows $12.50 at size sm', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-13: shows $12.50 at size sm', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={12.5} size="sm" />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$12.50');
       });
     });
 
-    it('PT-14: shows $12.50 at the default size', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-14: shows $12.50 at the default size', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={12.5} />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$12.50');
       });
     });
 
-    it('PT-15: shows $99.00 at size lg', { tags: ['@component', '@known-bug'] }, () => {
+    it('PT-15: shows $99.00 at size lg', { tags: '@component' }, () => {
       cy.mount(<PriceTag amount={99} size="lg" />);
       cy.findByText(priceNode).then(($el) => {
         expect(normalizedText($el), 'visible price').to.equal('$99.00');

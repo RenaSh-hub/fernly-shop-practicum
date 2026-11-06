@@ -7,7 +7,7 @@ describe('CareLevelBadge', () => {
 
       cy.findByText('Easy care', { exact: true }).should('be.visible');
       cy.get('[aria-hidden="true"]').then(($hidden) => {
-        expect($hidden.text(), 'dot count at level 1').to.equal('●');
+        expect($hidden.text(), 'dot count at level 1').to.equal('?');
       });
     });
 
@@ -16,16 +16,16 @@ describe('CareLevelBadge', () => {
 
       cy.findByText('Moderate care', { exact: true }).should('be.visible');
       cy.get('[aria-hidden="true"]').then(($hidden) => {
-        expect($hidden.text(), 'dot count at level 2').to.equal('●●');
+        expect($hidden.text(), 'dot count at level 2').to.equal('??');
       });
     });
 
-    it('CLB-03: three dots and Expert care at level 3', { tags: ['@component', '@known-bug'] }, () => {
+    it('CLB-03: three dots and Expert care at level 3', { tags: '@component' }, () => {
       cy.mount(<CareLevelBadge level={3} />);
 
       cy.findByText('Expert care', { exact: true }).should('be.visible');
       cy.get('[aria-hidden="true"]').then(($hidden) => {
-        expect($hidden.text(), 'dot count at level 3').to.equal('●●●');
+        expect($hidden.text(), 'dot count at level 3').to.equal('???');
       });
     });
   });
@@ -37,7 +37,7 @@ describe('CareLevelBadge', () => {
       cy.findByText('Easy care', { exact: true }).should('be.visible');
       cy.get('[aria-hidden="true"]').then(($hidden) => {
         expect($hidden, 'decorative dots count').to.have.length(1);
-        expect($hidden.text(), 'dots in hidden span').to.equal('●');
+        expect($hidden.text(), 'dots in hidden span').to.equal('?');
       });
     });
 
@@ -47,17 +47,17 @@ describe('CareLevelBadge', () => {
       cy.findByText('Moderate care', { exact: true }).should('be.visible');
       cy.get('[aria-hidden="true"]').then(($hidden) => {
         expect($hidden, 'decorative dots count').to.have.length(1);
-        expect($hidden.text(), 'dots in hidden span').to.equal('●●');
+        expect($hidden.text(), 'dots in hidden span').to.equal('??');
       });
     });
 
-    it('CLB-06: hides dots from assistive tech; name is Expert care', { tags: ['@component', '@known-bug'] }, () => {
+    it('CLB-06: hides dots from assistive tech; name is Expert care', { tags: '@component' }, () => {
       cy.mount(<CareLevelBadge level={3} />);
 
       cy.findByText('Expert care', { exact: true }).should('be.visible');
       cy.get('[aria-hidden="true"]').then(($hidden) => {
         expect($hidden, 'decorative dots count').to.have.length(1);
-        expect($hidden.text(), 'dots in hidden span').to.equal('●●●');
+        expect($hidden.text(), 'dots in hidden span').to.equal('???');
       });
     });
 

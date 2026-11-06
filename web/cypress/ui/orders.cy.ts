@@ -57,7 +57,7 @@ describe('Orders page (/orders)', () => {
     });
   });
 
-  it('shows $0.00 when an order total is zero', { tags: ['@ui', '@known-bug'] }, () => {
+  it('shows $0.00 when an order total is zero', { tags: '@ui' }, () => {
     stubSignedInOrdersList('orders/orders-list-total-zero.json');
     visitSignedIn('/orders');
     cy.wait(['@authMe', '@cart', '@orders']);

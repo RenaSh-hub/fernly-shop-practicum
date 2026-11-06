@@ -48,7 +48,6 @@ Follow `.cursor/rules/cypress-tests.mdc` for every test.
 - Prefer `findByRole`, then `findByLabelText`, then `findByText`. Never target CSS modules or tag names
 - Assert disabled / checked / values with `.then(($el) => expect($el, 'label').to.be.disabled)` (or `.checked` / value). Do not use `.should('be.disabled')` on `findByRole` — a miss reports "Unable to find" when the control exists but the state is wrong
 - Never `cy.wait(<milliseconds>)`. Never stub the page bundle or `cy.stub` the router
-- Do not put `@known-bug` on a test unless a human in this chat has confirmed that finding
 
 You may add `describe` groups by table section. Do not change `web/src` or `api/src`.
 
@@ -76,7 +75,7 @@ For each failing test, decide:
 - actual (from the Cypress output / DOM)
 - screenshot path under `web/cypress/screenshots/`
 
-Then append a bullet under `FINDINGS.md` **Suspicions — not yet tested**, with the spec path and test title as evidence. Do **not** promote it to a numbered **Findings** `F-NN` entry. Do **not** add `@known-bug`. Do **not** change `web/src` to green the test.
+Then append a bullet under `FINDINGS.md` **Suspicions — not yet tested**, with the spec path and test title as evidence. Do **not** promote it to a numbered **Findings** `F-NN` entry. Do **not** change `web/src` to green the test.
 
 **Wrong test** — typo, bad query, wrong fixture shape, title/ID mismatch, intercept that never fires. Fix the spec (or fixture) only. **Never** change the row's expected result to match the app. **Never** delete or comment out `expect(` / `.should(` (the assertion hook blocks that).
 
@@ -100,6 +99,5 @@ Also list skipped `assumed — ask` rows and each possible finding (row, expecte
 - Write only under `web/cypress/` and `FINDINGS.md`
 - Never touch `web/src` or `api/src`
 - Never weaken an assertion (hooks block a drop in active `expect(` / `.should(` counts)
-- Never add `@known-bug` without a human confirming the finding
 - Never call a suspicion a finding; label evidence **executed** when the test ran
 - This agent does not write or edit test-design tables — that is the component-test-design skill

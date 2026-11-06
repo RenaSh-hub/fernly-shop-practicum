@@ -114,7 +114,7 @@ describe('Feedback', () => {
         cy.findByRole('heading', { name: 'Page not found', level: 2 }).should('exist');
         cy.get('[aria-hidden="true"]').then(($hidden) => {
           expect($hidden, 'decorative sprout count').to.have.length(1);
-          expect($hidden.text(), 'sprout in hidden prefix').to.include('ðŸŒ±');
+          expect($hidden.text(), 'sprout in hidden prefix').to.include('??');
         });
       });
 
@@ -240,7 +240,7 @@ describe('Feedback', () => {
     });
 
     describe('accessibility', () => {
-      it('EB-08: alert named with the order load error', { tags: ['@component', '@known-bug'] }, () => {
+      it('EB-08: alert named with the order load error', { tags: '@component' }, () => {
         cy.mount(
           <ErrorBanner message="The order couldn't be loaded." onRetry={cy.spy()} />,
         );
@@ -256,7 +256,7 @@ describe('Feedback', () => {
         cy.findByRole('button', { name: 'Try again' }).should('exist');
       });
 
-      it('EB-10: no buttons when onRetry omitted; alert shows message', { tags: ['@component', '@known-bug'] }, () => {
+      it('EB-10: no buttons when onRetry omitted; alert shows message', { tags: '@component' }, () => {
         cy.mount(<ErrorBanner message="Invalid email or password." />);
 
         cy.findAllByRole('button').should('have.length', 0);
@@ -280,10 +280,10 @@ describe('Feedback', () => {
     describe('render', () => {
       it('TO-01: default success toast shows message and Dismiss', { tags: '@component' }, () => {
         cy.mount(
-          <Toast message="Added 1 Ã— Monstera to your cart." onClose={cy.spy()} duration={0} />,
+          <Toast message="Added 1 × Monstera to your cart." onClose={cy.spy()} duration={0} />,
         );
 
-        cy.findByText('Added 1 Ã— Monstera to your cart.').should('be.visible');
+        cy.findByText('Added 1 × Monstera to your cart.').should('be.visible');
         cy.findByRole('button', { name: 'Dismiss' }).should('exist');
       });
 
@@ -306,7 +306,7 @@ describe('Feedback', () => {
       it('TO-03: onClose is not called on mount when duration is 0', { tags: '@component' }, () => {
         const onClose = cy.spy().as('onClose');
         cy.mount(
-          <Toast message="Added 2 Ã— Aloe Vera to your cart." onClose={onClose} duration={0} />,
+          <Toast message="Added 2 × Aloe Vera to your cart." onClose={onClose} duration={0} />,
         );
 
         cy.get('@onClose').should('not.have.been.called');
@@ -315,7 +315,7 @@ describe('Feedback', () => {
       it('TO-04: Dismiss calls onClose once', { tags: '@component' }, () => {
         const onClose = cy.spy().as('onClose');
         cy.mount(
-          <Toast message="Added 2 Ã— Aloe Vera to your cart." onClose={onClose} duration={0} />,
+          <Toast message="Added 2 × Aloe Vera to your cart." onClose={onClose} duration={0} />,
         );
 
         cy.findByRole('button', { name: 'Dismiss' }).click();
@@ -328,22 +328,22 @@ describe('Feedback', () => {
       it('TO-05: onClose not called after 3999 ms at default duration', { tags: '@component' }, () => {
         cy.clock();
         const onClose = cy.spy().as('onClose');
-        cy.mount(<Toast message="Added 1 Ã— Monstera to your cart." onClose={onClose} />);
+        cy.mount(<Toast message="Added 1 × Monstera to your cart." onClose={onClose} />);
 
-        cy.findByText('Added 1 Ã— Monstera to your cart.').should('be.visible');
+        cy.findByText('Added 1 × Monstera to your cart.').should('be.visible');
 
         cy.tick(3999);
 
         cy.get('@onClose').should('not.have.been.called');
-        cy.findByText('Added 1 Ã— Monstera to your cart.').should('be.visible');
+        cy.findByText('Added 1 × Monstera to your cart.').should('be.visible');
       });
 
       it('TO-06: onClose called once after 4000 ms at default duration', { tags: '@component' }, () => {
         cy.clock();
         const onClose = cy.spy().as('onClose');
-        cy.mount(<Toast message="Added 1 Ã— Monstera to your cart." onClose={onClose} />);
+        cy.mount(<Toast message="Added 1 × Monstera to your cart." onClose={onClose} />);
 
-        cy.findByText('Added 1 Ã— Monstera to your cart.').should('be.visible');
+        cy.findByText('Added 1 × Monstera to your cart.').should('be.visible');
 
         cy.tick(4000);
 
@@ -395,15 +395,15 @@ describe('Feedback', () => {
     });
 
     describe('accessibility', () => {
-      it('TO-13: status named with the success message', { tags: ['@component', '@known-bug'] }, () => {
+      it('TO-13: status named with the success message', { tags: '@component' }, () => {
         cy.mount(
-          <Toast message="Added 1 Ã— Monstera to your cart." onClose={cy.spy()} duration={0} />,
+          <Toast message="Added 1 × Monstera to your cart." onClose={cy.spy()} duration={0} />,
         );
 
-        cy.findByRole('status', { name: 'Added 1 Ã— Monstera to your cart.' }).should('exist');
+        cy.findByRole('status', { name: 'Added 1 × Monstera to your cart.' }).should('exist');
       });
 
-      it('TO-14: error tone remains status, not alert', { tags: ['@component', '@known-bug'] }, () => {
+      it('TO-14: error tone remains status, not alert', { tags: '@component' }, () => {
         cy.mount(
           <Toast
             message="Only 3 left in stock."
@@ -419,7 +419,7 @@ describe('Feedback', () => {
 
       it('TO-15: exactly one button named Dismiss', { tags: '@component' }, () => {
         cy.mount(
-          <Toast message="Added 1 Ã— Monstera to your cart." onClose={cy.spy()} duration={0} />,
+          <Toast message="Added 1 × Monstera to your cart." onClose={cy.spy()} duration={0} />,
         );
 
         cy.findAllByRole('button').then(($buttons) => {
@@ -431,7 +431,7 @@ describe('Feedback', () => {
       it('TO-16: keyboard activates Dismiss', { tags: '@component' }, () => {
         const onClose = cy.spy().as('onClose');
         cy.mount(
-          <Toast message="Added 1 Ã— Monstera to your cart." onClose={onClose} duration={0} />,
+          <Toast message="Added 1 × Monstera to your cart." onClose={onClose} duration={0} />,
         );
 
         cy.findByRole('button', { name: 'Dismiss' }).type('{enter}');

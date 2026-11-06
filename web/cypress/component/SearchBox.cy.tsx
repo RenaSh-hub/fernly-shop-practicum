@@ -176,13 +176,13 @@ describe('SearchBox', () => {
       cy.findByRole('search').should('exist');
     });
 
-    it('SB-15: search field named Search plants when empty', { tags: ['@component', '@known-bug'] }, () => {
+    it('SB-15: search field named Search plants when empty', { tags: '@component' }, () => {
       cy.mount(<SearchBox value="" onSearch={cy.spy()} />);
 
       cy.findByRole('searchbox', { name: 'Search plants' }).should('exist');
     });
 
-    it('SB-16: search field named Search plants when filled', { tags: ['@component', '@known-bug'] }, () => {
+    it('SB-16: search field named Search plants when filled', { tags: '@component' }, () => {
       cy.mount(<SearchBox value="monstera" onSearch={cy.spy()} />);
 
       cy.findByRole('searchbox', { name: 'Search plants' }).should('exist');

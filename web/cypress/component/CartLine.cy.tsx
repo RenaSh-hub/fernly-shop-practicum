@@ -84,7 +84,7 @@ describe('CartLine', () => {
       cy.findByRole('listitem').find('img').should('have.attr', 'src', '/plants/snake.svg');
     });
 
-    it('CL-05: unit price $30.50 and each', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-05: unit price $30.50 and each', { tags: '@component' }, () => {
       mountCartLine();
 
       cy.findByText(/\$30\.50/);
@@ -97,13 +97,13 @@ describe('CartLine', () => {
       cy.findByText('$0.99');
     });
 
-    it('CL-07: line total $61.00', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-07: line total $61.00', { tags: '@component' }, () => {
       mountCartLine();
 
       cy.findByText('$61.00');
     });
 
-    it('CL-08: $24.50 each and $99.00 line total', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-08: $24.50 each and $99.00 line total', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, unitPrice: 24.5, lineTotal: 99 });
 
       cy.findByText('$24.50');
@@ -128,7 +128,7 @@ describe('CartLine', () => {
   });
 
   describe('boundary', () => {
-    it('CL-09: zero money shows $0.00', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-09: zero money shows $0.00', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, unitPrice: 0, lineTotal: 0 });
 
       cy.findByText('Line total:').then(($label) => {
@@ -139,21 +139,21 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-11: at minimum quantity 1, − disabled and + enabled', { tags: '@component' }, () => {
+    it('CL-11: at minimum quantity 1, - disabled and + enabled', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, quantity: 1 });
 
       quantityGroup().within(() => {
         cy.findByText('1');
       });
       decreaseButton().then(($btn) => {
-        expect($btn, '− at min').to.be.disabled;
+        expect($btn, '- at min').to.be.disabled;
       });
       increaseButton().then(($btn) => {
         expect($btn, '+ below stock').not.to.be.disabled;
       });
     });
 
-    it('CL-12: + disabled at stock limit', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-12: + disabled at stock limit', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, quantity: 3, stock: 3 });
 
       increaseButton().then(($btn) => {
@@ -169,11 +169,11 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-14: quantity and stock both 1 — stepper disabled, Remove enabled', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-14: quantity and stock both 1 � stepper disabled, Remove enabled', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, quantity: 1, stock: 1 });
 
       decreaseButton().then(($btn) => {
-        expect($btn, '− at min').to.be.disabled;
+        expect($btn, '- at min').to.be.disabled;
       });
       increaseButton().then(($btn) => {
         expect($btn, '+ at stock limit').to.be.disabled;
@@ -183,7 +183,7 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-15: quantity 20 at stock 20 — output 20 and + disabled', { tags: ['@component', '@known-bug'] }, () => {
+    it('CL-15: quantity 20 at stock 20 � output 20 and + disabled', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, quantity: 20, stock: 20 });
 
       quantityGroup().within(() => {
@@ -194,14 +194,14 @@ describe('CartLine', () => {
       });
     });
 
-    it('CL-16: stock 0 with quantity 1 — stepper disabled', { tags: '@component' }, () => {
+    it('CL-16: stock 0 with quantity 1 � stepper disabled', { tags: '@component' }, () => {
       mountCartLine({ ...defaultLine, quantity: 1, stock: 0 });
 
       increaseButton().then(($btn) => {
         expect($btn, '+ when stock 0').to.be.disabled;
       });
       decreaseButton().then(($btn) => {
-        expect($btn, '− at min with stock 0').to.be.disabled;
+        expect($btn, '- at min with stock 0').to.be.disabled;
       });
     });
 
@@ -225,7 +225,7 @@ describe('CartLine', () => {
       mountCartLine();
 
       decreaseButton().then(($btn) => {
-        expect($btn, '− default').not.to.be.disabled;
+        expect($btn, '- default').not.to.be.disabled;
       });
       increaseButton().then(($btn) => {
         expect($btn, '+ default').not.to.be.disabled;
@@ -239,7 +239,7 @@ describe('CartLine', () => {
       mountCartLine(defaultLine, { busy: true });
 
       decreaseButton().then(($btn) => {
-        expect($btn, '− busy').to.be.disabled;
+        expect($btn, '- busy').to.be.disabled;
       });
       increaseButton().then(($btn) => {
         expect($btn, '+ busy').to.be.disabled;
@@ -294,7 +294,7 @@ describe('CartLine', () => {
       cy.get('@onRemove').should('have.been.calledOnceWithExactly', 'ln-other');
     });
 
-    it('CL-24: busy — clicks on disabled controls do not call callbacks', { tags: '@component' }, () => {
+    it('CL-24: busy � clicks on disabled controls do not call callbacks', { tags: '@component' }, () => {
       mountCartLine(defaultLine, { busy: true });
 
       increaseButton().click({ force: true });
@@ -334,7 +334,7 @@ describe('CartLine', () => {
       mountCartLine(defaultLine, { busy: true });
 
       cy.findByRole('button', { name: 'Decrease quantity' }).then(($btn) => {
-        expect($btn, '− name when busy').to.be.disabled;
+        expect($btn, '- name when busy').to.be.disabled;
       });
       cy.findByRole('button', { name: 'Increase quantity' }).then(($btn) => {
         expect($btn, '+ name when busy').to.be.disabled;
