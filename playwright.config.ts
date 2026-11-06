@@ -20,6 +20,15 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { open: 'never' }],
+    // Playwright does not support per-project reporters in config types; this runs for all projects but only emits when @a11y tests ran.
+    [
+      './tests/a11y/reporter.ts',
+      {
+        outputFolder: 'a11y-report',
+        baseline: './tests/a11y/a11y-baseline.json',
+        title: 'Fernly accessibility',
+      },
+    ],
   ],
   use: {
     ...devices['Desktop Chrome'],

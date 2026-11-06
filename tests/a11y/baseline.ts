@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Result } from 'axe-core';
+import type { Result, UnlabelledFrameSelector } from 'axe-core';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -78,25 +78,27 @@ export function clearBaselineCache(): void {
   cachedBaseline = undefined;
 }
 
-function nodeTargetKey(target: string[]): string {
-  return target.join(' >> ');
+/** axe's selector type is wider than string[]; we normalize for baseline matching */
+export function nodeTargetKeyFromSelector(target: UnlabelledFrameSelector): string {
+  const parts = target as unknown as string[];
+  return parts.join(' >> ');
 }
 
-function matchesBaselineEntry(
+export function matchesBaselineEntry(
   ruleId: string,
   pageName: string,
-  nodeTarget: string[],
+  nodeTarget: UnlabelledFrameSelector,
   entry: BaselineEntry,
 ): boolean {
   if (entry.rule !== ruleId || entry.page !== pageName) return false;
   if (entry.target === '*') return true;
-  return nodeTargetKey(nodeTarget) === entry.target;
+  return nodeTargetKeyFromSelector(nodeTarget) === entry.target;
 }
 
 function classifyNode(
   rule: Result,
   pageName: string,
-  nodeTarget: string[],
+  nodeTarget: UnlabelledFrameSelector,
   baseline: BaselineEntry[],
 ): ViolationClassification {
   const today = todayYmd();
@@ -129,7 +131,7 @@ export function classifyAxeViolations(pageName: string, violations: Result[], ba
         help: rule.help,
         helpUrl: rule.helpUrl,
         impact,
-        target: node.target,
+        target: node.target as unknown as string[],
         html: node.html,
         classification,
       });
