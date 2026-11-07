@@ -1,0 +1,15 @@
+{
+  "id": "pl-zero-ui",
+  "name": "Succulent Cutting",
+  "latinName": "Assorted succulent",
+  "price": 0,
+  "light": "bright",
+  "careLevel": 1,
+  "petSafe": true,
+  "stock": 40,
+  "rating": 4.0,
+  "imageUrl": "/plants/succulent.svg",
+  "description": "A single rooted cutting to start your collection.",
+  "sizes": [{ "label": "S", "priceDelta": 0 }],
+  "similar": []
+}
