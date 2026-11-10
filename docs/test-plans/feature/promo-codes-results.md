@@ -8,18 +8,18 @@ App code unchanged (`web/src`, `api/src`); `tests/a11y/a11y-baseline.json` not e
 
 | row | test | result | possible finding |
 | --- | --- | --- | --- |
-| T1 | `tests/api/promo-codes.spec.ts` — LEAFY10 plants-only discount; validation; shipping unchanged | **fail** (schema, `promoCode`, shipping, validation, total math vs returned discount pass; soft: discount **2.69** ≠ **2.00**) | Percent off includes shipping. See FINDINGS Suspicions. |
-| T2 | `tests/api/promo-codes.spec.ts` — FREESHIP; $50 pre-discount rule; percent keeps free shipping | **fail** (FREESHIP → shipping 0 pass; under-$50 after percent keeps shipping pass; soft: $50 cart still **6.95**; leafy discount includes shipping; shipping not free after leafy at $50) | `$50` uses `>`; percent base wrong. See FINDINGS Suspicions. |
-| T3 | `tests/api/promo-codes.spec.ts` — case-insensitive; replace; DELETE; unknown | **fail** (`leafy10`→LEAFY10, replace FREESHIP, DELETE clear, unknown `promo_invalid` pass; soft: discount **1.95** ≠ **1.25**) | Same percent-base bug. See FINDINGS Suspicions. |
-| T4 | `tests/api/promo-codes.spec.ts` — expired SPRING5; empty cart | **fail** (empty cart `empty_cart` + “Add a plant…” pass; unknown `promo_invalid` pass; **SPRING5 → 200**) | Expired code accepted. See FINDINGS Suspicions. |
+| T1 | `tests/api/promo-codes.spec.ts` — LEAFY10 plants-only discount; validation; shipping unchanged | **known bug** `@known-bug` + `FINDING-14` (hand repro: discount **2.69** ≠ **2.00**) | **F-14** |
+| T2 | `tests/api/promo-codes.spec.ts` — FREESHIP; $50 pre-discount rule; percent keeps free shipping | **known bug** `@known-bug` + `FINDING-16` (+ F-14 soft on percent at $50) | **F-16**, **F-14** |
+| T3 | `tests/api/promo-codes.spec.ts` — case-insensitive; replace; DELETE; unknown | **known bug** `@known-bug` + `FINDING-14` (soft discount only) | **F-14** |
+| T4 | `tests/api/promo-codes.spec.ts` — expired SPRING5; empty cart | **known bug** `@known-bug` + `FINDING-15` (**SPRING5 → 200**) | **F-15** |
 | T5 | `tests/api/promo-codes.spec.ts` — auth on promo routes | **pass** | — |
-| T6 | `tests/api/promo-codes.spec.ts` — order keeps promo; cart clears | **fail** (order copies `promoCode`/`discount`/`total`; new cart null/0 pass; soft: cart discount wrong vs plants-only oracle) | Same percent-base bug on stored order amounts. See FINDINGS Suspicions. |
-| T7 | `web/cypress/component/OrderSummary.cy.tsx` — T7-01..05 | **fail** (2 pass / 3 fail: T7-01, T7-04, T7-05) | Discount shows `−$4` not `−$4.00` (F-01 family). See FINDINGS Suspicions. |
-| T8 | `web/cypress/component/PromoCodeInput.cy.tsx` — T8-01..10 | **fail** (8 pass / 2 fail: T8-09, T8-10) | Missing accessible name; error not in live region. See FINDINGS Suspicions. |
-| T9 | `web/cypress/ui/cart-promo.cy.ts` — T9-01..06 | **pass** (6/6) | — |
-| T10 | `web/cypress/ui/checkout-order-promo.cy.ts` — T10-01..04 | **pass** (4/4) | — |
-| T11 | `tests/e2e/promo-codes.spec.ts` — cart → checkout → order; FREESHIP; refusals | **fail** (LEAFY10 + order page + cart clear + FREESHIP through checkout pass; soft: SPRING5 accepted / no expired copy; discount plants-only) | Expired + percent-base. See FINDINGS Suspicions. |
-| T12 | `tests/a11y/pages.spec.ts` — Cart promo field / applied; Checkout with discount | **fail** | New axe `label` on promo input; `color-contrast` on PriceTag (F-12 class) on new scan names. See FINDINGS Suspicions. |
+| T6 | `tests/api/promo-codes.spec.ts` — order keeps promo; cart clears | **known bug** `@known-bug` + `FINDING-14` (soft discount on cart) | **F-14** |
+| T7 | `web/cypress/component/OrderSummary.cy.tsx` — T7-01..05 | **known bug** T7-01/04/05 `@known-bug` (discount `−$4` not `−$4.00`) | **F-01** |
+| T8 | `web/cypress/component/PromoCodeInput.cy.tsx` — T8-01..10 | **known bug** T8-09/10 `@known-bug` | **F-17**, **F-18** |
+| T9 | `web/cypress/ui/cart-promo.cy.ts` — T9-01..06 | **pass** (6/6) when app + proxy up | — |
+| T10 | `web/cypress/ui/checkout-order-promo.cy.ts` — T10-01..04 | **pass** (4/4) when app + proxy up | — |
+| T11 | `tests/e2e/promo-codes.spec.ts` — cart → checkout → order; FREESHIP; refusals | **known bug** `@known-bug` + `FINDING-15` (also soft **F-14** on discount) | **F-15**, **F-14** |
+| T12 | `tests/a11y/pages.spec.ts` — Cart promo field / applied; Checkout with discount | **known bug** `@known-bug` + `FINDING-17` / `FINDING-12` | **F-17**, **F-12** |
 
 ## Specs / fixtures written
 

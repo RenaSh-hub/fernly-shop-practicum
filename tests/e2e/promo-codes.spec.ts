@@ -44,9 +44,10 @@ async function applyCodeOnCart(page: Page, code: string) {
 }
 
 test.describe('Promo codes journey', () => {
-  test('T11: LEAFY10 and FREESHIP through checkout; refused codes leave total unchanged', { tag: '@e2e' }, async ({
+  test('T11: LEAFY10 and FREESHIP through checkout; refused codes leave total unchanged', { tag: ['@e2e', '@known-bug'] }, async ({
     page,
   }) => {
+    test.fail(true, 'FINDING-15: Expired promo code SPRING5 is accepted');
     test.setTimeout(90_000);
     await signIn(page);
 

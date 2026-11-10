@@ -234,7 +234,7 @@ describe('OrderSummary', () => {
   });
 
   describe('promo discount', () => {
-    it('T7-01: shows Discount (LEAFY10) and −$4.00', { tags: '@component' }, () => {
+    it('T7-01: shows Discount (LEAFY10) and −$4.00', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary {...withDiscount} />);
 
       cy.findByText('Discount (LEAFY10)');
@@ -257,7 +257,7 @@ describe('OrderSummary', () => {
       cy.findByText(/Discount/).should('not.exist');
     });
 
-    it('T7-04: Discount without code and −$4.00 when promoCode is null', { tags: '@component' }, () => {
+    it('T7-04: Discount without code and −$4.00 when promoCode is null', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(
         <OrderSummary
           itemCount={1}
@@ -278,7 +278,7 @@ describe('OrderSummary', () => {
       });
     });
 
-    it('T7-05: Order summary region contains −$4.00', { tags: '@component' }, () => {
+    it('T7-05: Order summary region contains −$4.00', { tags: ['@component', '@known-bug'] }, () => {
       cy.mount(<OrderSummary {...withDiscount} />);
 
       region('Order summary').within(() => {

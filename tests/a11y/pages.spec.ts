@@ -104,7 +104,8 @@ async function applyLeafy10ViaApi(page: Page): Promise<void> {
   expect(res.ok(), `apply LEAFY10 via API (${res.status()})`).toBeTruthy();
 }
 
-test('T12: Cart with promo field visible', { tag: '@a11y' }, async ({ page }, testInfo) => {
+test('T12: Cart with promo field visible', { tag: ['@a11y', '@known-bug'] }, async ({ page }, testInfo) => {
+  test.fail(true, 'FINDING-17: Promo code input has no accessible name');
   await signInAsFirstCustomer(page);
   await ensureCartHasOnePlant(page);
   await page.goto('/cart');
@@ -118,7 +119,8 @@ test('T12: Cart with promo field visible', { tag: '@a11y' }, async ({ page }, te
   expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
 });
 
-test('T12: Cart with promo code applied', { tag: '@a11y' }, async ({ page }, testInfo) => {
+test('T12: Cart with promo code applied', { tag: ['@a11y', '@known-bug'] }, async ({ page }, testInfo) => {
+  test.fail(true, 'FINDING-12: Price text fails WCAG color contrast');
   await signInAsFirstCustomer(page);
   await ensureCartHasOnePlant(page);
   await applyLeafy10ViaApi(page);
@@ -129,7 +131,8 @@ test('T12: Cart with promo code applied', { tag: '@a11y' }, async ({ page }, tes
   expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
 });
 
-test('T12: Checkout with discount line', { tag: '@a11y' }, async ({ page }, testInfo) => {
+test('T12: Checkout with discount line', { tag: ['@a11y', '@known-bug'] }, async ({ page }, testInfo) => {
+  test.fail(true, 'FINDING-12: Price text fails WCAG color contrast');
   await signInAsFirstCustomer(page);
   await ensureCartHasOnePlant(page);
   await applyLeafy10ViaApi(page);

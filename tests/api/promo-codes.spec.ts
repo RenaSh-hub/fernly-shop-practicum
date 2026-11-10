@@ -61,9 +61,10 @@ async function addPlant(
 }
 
 test.describe('Promo codes API', () => {
-  test('T1: LEAFY10 percent off plant subtotal only; validation; cents; shipping unchanged', { tag: '@api' }, async ({
+  test('T1: LEAFY10 percent off plant subtotal only; validation; cents; shipping unchanged', { tag: ['@api', '@known-bug'] }, async ({
     request,
   }) => {
+    test.fail(true, 'FINDING-14: Percent promo discount includes shipping in the base');
     const token = await login(request, AVA);
     await clearCart(request, token);
     // Peace Lily $19.99 — 10% → $2.00 after cent rounding; under $50 so shipping charged
@@ -113,9 +114,10 @@ test.describe('Promo codes API', () => {
     expect((await whitespace.json()).rule).toBe('validation_error');
   });
 
-  test('T2: FREESHIP zeros shipping; $50 rule uses pre-discount subtotal; percent keeps free shipping', { tag: '@api' }, async ({
+  test('T2: FREESHIP zeros shipping; $50 rule uses pre-discount subtotal; percent keeps free shipping', { tag: ['@api', '@known-bug'] }, async ({
     request,
   }) => {
+    test.fail(true, 'FINDING-16: Free shipping not applied at exactly $50.00');
     const token = await login(request, AVA);
     await clearCart(request, token);
 
@@ -178,9 +180,10 @@ test.describe('Promo codes API', () => {
     expect(underAfter.shipping, 'pre-discount subtotal < $50 keeps shipping').toBe(SHIPPING_FEE);
   });
 
-  test('T3: case-insensitive apply; replace one code; DELETE clears; unknown refused', { tag: '@api' }, async ({
+  test('T3: case-insensitive apply; replace one code; DELETE clears; unknown refused', { tag: ['@api', '@known-bug'] }, async ({
     request,
   }) => {
+    test.fail(true, 'FINDING-14: Percent promo discount includes shipping in the base');
     const token = await login(request, AVA);
     await clearCart(request, token);
     await addPlant(request, token, 'pl-pothos');
@@ -222,7 +225,8 @@ test.describe('Promo codes API', () => {
     expect((await unknown.json()).rule).toBe('promo_invalid');
   });
 
-  test('T4: expired SPRING5 and empty cart refused', { tag: '@api' }, async ({ request }) => {
+  test('T4: expired SPRING5 and empty cart refused', { tag: ['@api', '@known-bug'] }, async ({ request }) => {
+    test.fail(true, 'FINDING-15: Expired promo code SPRING5 is accepted');
     const token = await login(request, AVA);
     await clearCart(request, token);
 
@@ -281,7 +285,8 @@ test.describe('Promo codes API', () => {
     expect(((await mine.json()) as CartBody).promoCode).toBe('LEAFY10');
   });
 
-  test('T6: order keeps discount/promoCode; new cart has no promo', { tag: '@api' }, async ({ request }) => {
+  test('T6: order keeps discount/promoCode; new cart has no promo', { tag: ['@api', '@known-bug'] }, async ({ request }) => {
+    test.fail(true, 'FINDING-14: Percent promo discount includes shipping in the base');
     const token = await login(request, AVA);
     await clearCart(request, token);
     await addPlant(request, token, 'pl-rubber');

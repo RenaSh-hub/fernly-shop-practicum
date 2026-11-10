@@ -156,7 +156,7 @@ describe('PromoCodeInput', () => {
   describe('accessibility', () => {
     it(
       'T8-09: code field has accessible name Promo code',
-      { tags: '@component' },
+      { tags: ['@component', '@known-bug'] },
       () => {
         cy.mount(
           <PromoCodeInput
@@ -172,7 +172,7 @@ describe('PromoCodeInput', () => {
 
     it(
       'T8-10: refused message is in a live region',
-      { tags: '@component' },
+      { tags: ['@component', '@known-bug'] },
       () => {
         cy.mount(
           <PromoCodeInput
