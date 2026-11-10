@@ -616,14 +616,17 @@ function publish(dryRun) {
     }
     const existing = comments.find((c) => (c.body || '').trimStart().startsWith(MARKER));
     if (existing) {
-      runGh([
-        'api',
-        '-X',
-        'PATCH',
-        `repos/${owner}/${name}/issues/comments/${existing.id}`,
-        '-F',
-        `body@${commentPath}`,
-      ]);
+      runGh(
+        [
+          'api',
+          '-X',
+          'PATCH',
+          `repos/${owner}/${name}/issues/comments/${existing.id}`,
+          '--input',
+          '-',
+        ],
+        JSON.stringify({ body }),
+      );
       console.log(`Updated PR comment ${existing.id}`);
     } else {
       runGh(['pr', 'comment', pr, '--repo', repo, '--body-file', commentPath]);
