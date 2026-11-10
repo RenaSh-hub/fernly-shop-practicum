@@ -26,5 +26,7 @@
   "itemCount": 2,
   "subtotal": 40.5,
   "shipping": 6.95,
+  "discount": 0,
+  "promoCode": null,
   "total": 47.45
 }

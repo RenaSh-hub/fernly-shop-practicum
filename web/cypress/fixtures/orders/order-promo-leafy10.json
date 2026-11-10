@@ -1,0 +1,38 @@
+{
+  "id": "ord-ui-promo-leafy10",
+  "status": "placed",
+  "createdAt": "2026-11-06T14:00:00.000Z",
+  "lines": [
+    {
+      "id": "ln-promo-a",
+      "plantId": "pl-ui-a",
+      "name": "Monstera Deliciosa",
+      "size": "M",
+      "unitPrice": 25,
+      "quantity": 1,
+      "lineTotal": 25,
+      "imageUrl": "/plants/monstera.svg"
+    },
+    {
+      "id": "ln-promo-b",
+      "plantId": "pl-ui-b",
+      "name": "Snake Plant",
+      "size": "S",
+      "unitPrice": 15.5,
+      "quantity": 1,
+      "lineTotal": 15.5,
+      "imageUrl": "/plants/snake.svg"
+    }
+  ],
+  "subtotal": 40.5,
+  "discount": 4.05,
+  "promoCode": "LEAFY10",
+  "shipping": 6.95,
+  "total": 43.4,
+  "shippingAddress": {
+    "fullName": "Ava Fern",
+    "address": "1 Fern Lane",
+    "city": "Greenfield",
+    "postalCode": "H0H0H0"
+  }
+}

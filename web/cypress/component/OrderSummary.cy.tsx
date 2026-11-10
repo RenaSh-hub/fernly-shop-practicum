@@ -2,6 +2,14 @@ import { OrderSummary } from '../../src/components/OrderSummary';
 
 const charged = { itemCount: 2, subtotal: 25, shipping: 6.95, total: 31.95 };
 const atThreshold = { itemCount: 1, subtotal: 50, shipping: 0, total: 50 };
+const withDiscount = {
+  itemCount: 1,
+  subtotal: 40,
+  shipping: 6.95,
+  discount: 4,
+  promoCode: 'LEAFY10',
+  total: 42.95,
+};
 
 function normalizedText(node: { text: () => string }): string {
   return node.text().replace(/\s+/g, ' ').trim();
@@ -222,6 +230,62 @@ describe('OrderSummary', () => {
       cy.mount(<OrderSummary {...charged} />);
 
       cy.findAllByRole('button').should('have.length', 0);
+    });
+  });
+
+  describe('promo discount', () => {
+    it('T7-01: shows Discount (LEAFY10) and −$4.00', { tags: '@component' }, () => {
+      cy.mount(<OrderSummary {...withDiscount} />);
+
+      cy.findByText('Discount (LEAFY10)');
+      region('Order summary').within(() => {
+        cy.findByText('−$4.00').then(($el) => {
+          expect(normalizedText($el), 'discount amount').to.equal('−$4.00');
+        });
+      });
+    });
+
+    it('T7-02: no Discount term when discount and promoCode omitted', { tags: '@component' }, () => {
+      cy.mount(<OrderSummary {...charged} />);
+
+      cy.findByText(/Discount/).should('not.exist');
+    });
+
+    it('T7-03: no Discount term when discount is 0 even if promoCode set', { tags: '@component' }, () => {
+      cy.mount(<OrderSummary {...charged} discount={0} promoCode="LEAFY10" />);
+
+      cy.findByText(/Discount/).should('not.exist');
+    });
+
+    it('T7-04: Discount without code and −$4.00 when promoCode is null', { tags: '@component' }, () => {
+      cy.mount(
+        <OrderSummary
+          itemCount={1}
+          subtotal={40}
+          shipping={6.95}
+          discount={4}
+          promoCode={null}
+          total={42.95}
+        />,
+      );
+
+      cy.findByText('Discount');
+      cy.findByText(/Discount \(/).should('not.exist');
+      region('Order summary').within(() => {
+        cy.findByText('−$4.00').then(($el) => {
+          expect(normalizedText($el), 'discount amount').to.equal('−$4.00');
+        });
+      });
+    });
+
+    it('T7-05: Order summary region contains −$4.00', { tags: '@component' }, () => {
+      cy.mount(<OrderSummary {...withDiscount} />);
+
+      region('Order summary').within(() => {
+        cy.findByText('−$4.00').then(($el) => {
+          expect(normalizedText($el), 'discount amount').to.equal('−$4.00');
+        });
+      });
     });
   });
 });
