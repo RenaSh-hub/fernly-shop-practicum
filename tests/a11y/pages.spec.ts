@@ -42,6 +42,26 @@ test('Plant (/plants/pl-monstera)', { tag: '@a11y' }, async ({ page }, testInfo)
   expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
 });
 
+test('Plant Reviews signed-out (/plants/pl-snake)', { tag: '@a11y' }, async ({ page }, testInfo) => {
+  await page.goto('/plants/pl-snake');
+  await expect(page.getByRole('heading', { level: 2, name: 'Reviews' })).toBeVisible();
+  const { blocking } = await scanPage(page, testInfo, { name: 'Plant Reviews signed-out' });
+  expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
+});
+
+test('Plant Reviews signed-in (/plants/pl-snake)', { tag: '@a11y' }, async ({ page }, testInfo) => {
+  await signInAsFirstCustomer(page);
+  await page.goto('/plants/pl-snake');
+  await expect(page.getByRole('heading', { level: 2, name: 'Reviews' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Write a review' })).toBeVisible();
+  // Star radiogroup must be usable from the keyboard (feature oracle)
+  const group = page.getByRole('radiogroup', { name: 'Your rating' });
+  await group.focus();
+  await page.keyboard.press('ArrowRight');
+  const { blocking } = await scanPage(page, testInfo, { name: 'Plant Reviews signed-in' });
+  expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
+});
+
 test('Sign in (/login)', { tag: '@a11y' }, async ({ page }, testInfo) => {
   await page.goto('/login');
   const { blocking } = await scanPage(page, testInfo, { name: 'Sign in' });
