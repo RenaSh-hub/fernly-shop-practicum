@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { PlantPage } from '../pages/PlantPage.js';
+import { SignInPage } from '../pages/SignInPage.js';
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:8100';
 
@@ -12,25 +14,25 @@ test.describe('Plant reviews journey', () => {
     const postPlants = ['pl-parlor', 'pl-ponytail', 'pl-birkin'] as const;
     const postPlantId = postPlants[testInfo.retry] ?? 'pl-parlor';
 
+    const plant = new PlantPage(page);
+
     // Guest: seeded Snake Plant reviews (5+4+5) — feature oracle average 4.7
-    await page.goto('/plants/pl-snake');
-    await expect(page.getByRole('heading', { level: 2, name: 'Reviews' })).toBeVisible();
-    await expect(page.getByText('Grace L.')).toBeVisible();
+    await plant.goto('pl-snake');
+    await expect(plant.reviewsHeading).toBeVisible();
+    await expect(plant.reviewerName('Grace L.')).toBeVisible();
     await expect
-      .soft(page.getByText(/4\.7 out of 5/), 'feature oracle: 5+4+5 → 4.7')
+      .soft(plant.textMatching(/4\.7 out of 5/), 'feature oracle: 5+4+5 → 4.7')
       .toBeVisible({ timeout: 2000 });
 
-    const reviewsSignIn = page.locator('a[href="/login?next=/plants/pl-snake"]');
-    await expect(reviewsSignIn).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Write a review' })).toHaveCount(0);
+    await expect(plant.reviewsSignInLink).toBeVisible();
+    await expect(plant.writeReviewHeading).toHaveCount(0);
 
-    await reviewsSignIn.click();
+    await plant.reviewsSignInLink.click();
     await expect(page).toHaveURL(/\/login\?next=\/plants\/pl-snake/);
-    await page.getByLabel('Email').fill(AVA.email);
-    await page.getByLabel('Password').fill(AVA.password);
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    const signIn = new SignInPage(page);
+    await signIn.signIn(AVA.email, AVA.password);
     await expect(page).toHaveURL(/\/plants\/pl-snake/);
-    await expect(page.getByText('Hi, Ava')).toBeVisible();
+    await expect(plant.signedInGreeting('Ava')).toBeVisible();
 
     // Clear any prior review from a previous retry so Post can succeed
     const loginRes = await page.request.post(`${apiUrl}/api/auth/login`, { data: AVA });
@@ -47,19 +49,19 @@ test.describe('Plant reviews journey', () => {
       }
     }
 
-    await page.goto(`/plants/${postPlantId}`);
-    await expect(page.getByText('Hi, Ava')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Write a review' })).toBeVisible();
+    await plant.goto(postPlantId);
+    await expect(plant.signedInGreeting('Ava')).toBeVisible();
+    await expect(plant.writeReviewHeading).toBeVisible();
 
     const reviewText = `Parlor palm thrives indoors for Fernly ${Date.now()}.`;
-    await page.getByRole('radio', { name: '5 stars' }).click();
-    await page.getByLabel('Your review').fill(`  ${reviewText}  `);
-    await page.getByRole('button', { name: 'Post review' }).click();
+    await plant.chooseStarRating(5);
+    await plant.fillReview(`  ${reviewText}  `);
+    await plant.submitReview();
 
-    await expect(page.getByText('Thanks for your review!')).toBeVisible();
+    await expect(plant.thanksForReviewToast).toBeVisible();
     // Soft: list may not refresh (query-key mismatch) — still exercise second-post error
     await expect
-      .soft(page.getByText(reviewText), 'new review must appear in the list right away')
+      .soft(plant.textMatching(reviewText), 'new review must appear in the list right away')
       .toBeVisible({ timeout: 3000 });
 
     const listRes = await page.request.get(`${apiUrl}/api/plants/${postPlantId}/reviews`);
@@ -71,10 +73,10 @@ test.describe('Plant reviews journey', () => {
     expect(listBody.reviews[0].text).toBe(reviewText);
     expect(listBody.reviews[0].author).toBe('Ava Green');
 
-    await page.getByRole('radio', { name: '4 stars' }).click();
-    await page.getByLabel('Your review').fill('Second attempt should be rejected by the API.');
-    await page.getByRole('button', { name: 'Post review' }).click();
-    await expect(page.getByRole('alert')).toBeVisible();
-    await expect(page.getByRole('alert')).toContainText(/already reviewed/i);
+    await plant.chooseStarRating(4);
+    await plant.fillReview('Second attempt should be rejected by the API.');
+    await plant.submitReview();
+    await expect(plant.formAlert).toBeVisible();
+    await expect(plant.formAlert).toContainText(/already reviewed/i);
   });
 });

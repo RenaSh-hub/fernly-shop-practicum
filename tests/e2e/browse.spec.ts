@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { BrowsePage } from '../pages/BrowsePage.js';
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:8100';
 
@@ -10,11 +11,10 @@ test.describe('Browse', () => {
     expect(ascBody.items.length).toBeGreaterThan(1);
     const mostExpensive = ascBody.items[ascBody.items.length - 1];
 
-    await page.goto('/');
+    const browse = new BrowsePage(page);
+    await browse.goto();
+    await browse.selectSortByLabel('Price: high to low');
 
-    await page.getByRole('combobox', { name: 'Sort by' }).selectOption({ label: 'Price: high to low' });
-
-    const firstCard = page.getByRole('article').first();
-    await expect(firstCard.getByRole('heading', { level: 3, name: mostExpensive.name })).toBeVisible();
+    await expect(browse.plantNameHeadingOnFirstCard(mostExpensive.name)).toBeVisible();
   });
 });

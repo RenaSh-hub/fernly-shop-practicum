@@ -1,4 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
+import { SignInPage } from '../pages/SignInPage.js';
+import { PlantPage } from '../pages/PlantPage.js';
+import { CartPage } from '../pages/CartPage.js';
+import { CheckoutPage } from '../pages/CheckoutPage.js';
+import { OrderDetailPage } from '../pages/OrderDetailPage.js';
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:8100';
 
@@ -12,12 +17,11 @@ function roundCents(value: number): number {
 }
 
 async function signIn(page: Page) {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill(AVA.email);
-  await page.getByLabel('Password').fill(AVA.password);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  const signIn = new SignInPage(page);
+  await signIn.goto();
+  await signIn.signIn(AVA.email, AVA.password);
   await expect(page).not.toHaveURL(/\/login/);
-  await expect(page.getByText('Hi, Ava')).toBeVisible();
+  await expect(signIn.signedInGreeting('Ava')).toBeVisible();
 }
 
 async function clearCartViaApi(page: Page, token: string) {
@@ -36,13 +40,6 @@ async function clearCartViaApi(page: Page, token: string) {
   });
 }
 
-async function applyCodeOnCart(page: Page, code: string) {
-  await expect(page.getByText(/Have a promo code\?/i)).toBeVisible();
-  const input = page.locator('form').filter({ hasText: /Have a promo code/i }).locator('input');
-  await input.fill(code);
-  await page.getByRole('button', { name: 'Apply' }).click();
-}
-
 test.describe('Promo codes journey', () => {
   test('T11: LEAFY10 and FREESHIP through checkout; refused codes leave total unchanged', { tag: ['@e2e', '@known-bug'] }, async ({
     page,
@@ -57,44 +54,47 @@ test.describe('Promo codes journey', () => {
     const authHeader = { Authorization: `Bearer ${token}` };
     await clearCartViaApi(page, token);
 
-    await page.goto('/plants/pl-peace-lily');
-    await page.getByRole('button', { name: 'Add to cart' }).click();
-    await expect(page.getByText(/Added .* to your cart/)).toBeVisible();
+    const plant = new PlantPage(page);
+    await plant.goto('pl-peace-lily');
+    await plant.addToCart();
+    await expect(plant.addedToCartToast).toBeVisible();
 
-    await page.goto('/cart');
-    await expect(page.getByRole('heading', { level: 1, name: 'Your cart' })).toBeVisible();
-    const summary = page.getByRole('region', { name: 'Order summary' });
+    const cart = new CartPage(page);
+    await cart.goto();
+    await expect(cart.pageTitle).toBeVisible();
+    const summary = cart.orderSummary;
     await expect(summary).toBeVisible();
 
     const beforeUnknown = await page.request.get(`${apiUrl}/api/cart`, { headers: authHeader });
     const beforeUnknownBody = (await beforeUnknown.json()) as { total: number; promoCode: string | null };
 
-    await applyCodeOnCart(page, 'NOTAREAL');
-    await expect(page.getByText(/don.?t recognize|invalid/i).first()).toBeVisible({ timeout: 5000 });
+    await expect(cart.havePromoCodePrompt).toBeVisible();
+    await cart.applyPromoCode('NOTAREAL');
+    await expect(cart.promoErrorMessage(/don.?t recognize|invalid/i)).toBeVisible({ timeout: 5000 });
     const afterUnknown = await page.request.get(`${apiUrl}/api/cart`, { headers: authHeader });
     const afterUnknownBody = (await afterUnknown.json()) as { total: number; promoCode: string | null };
     expect(afterUnknownBody.promoCode).toBeNull();
     expect(afterUnknownBody.total).toBe(beforeUnknownBody.total);
 
     // Expired SPRING5 must refuse (oracle). Clear via API if the shop wrongly accepts it.
-    await applyCodeOnCart(page, 'SPRING5');
+    await cart.applyPromoCode('SPRING5');
     const afterSpringRes = await page.request.get(`${apiUrl}/api/cart`, { headers: authHeader });
     const afterSpring = (await afterSpringRes.json()) as { promoCode: string | null; total: number };
     expect
       .soft(afterSpring.promoCode, 'SPRING5 is expired and must not stick on the cart')
       .toBeNull();
     await expect
-      .soft(page.getByText(/expired/i), 'UI must say the code has expired')
+      .soft(cart.promoExpiredMessage(/expired/i), 'UI must say the code has expired')
       .toBeVisible({ timeout: 2000 });
     if (afterSpring.promoCode) {
       await page.request.delete(`${apiUrl}/api/cart/promo`, { headers: authHeader });
-      await page.reload();
-      await expect(page.getByText(/Have a promo code\?/i)).toBeVisible();
+      await cart.reload();
+      await expect(cart.havePromoCodePrompt).toBeVisible();
     }
 
-    await applyCodeOnCart(page, 'LEAFY10');
-    await expect(page.getByText(/Code\s+LEAFY10\s+applied/i)).toBeVisible({ timeout: 5000 });
-    await expect(summary.getByText(/Discount \(LEAFY10\)/)).toBeVisible();
+    await cart.applyPromoCode('LEAFY10');
+    await expect(cart.promoAppliedMessage('LEAFY10')).toBeVisible({ timeout: 5000 });
+    await expect(cart.orderSummaryDiscountFor('LEAFY10')).toBeVisible();
 
     const cartSnapshot = await page.request.get(`${apiUrl}/api/cart`, { headers: authHeader });
     expect(cartSnapshot.ok()).toBeTruthy();
@@ -108,20 +108,21 @@ test.describe('Promo codes journey', () => {
     expect(cartBody.promoCode).toBe('LEAFY10');
     expect.soft(cartBody.discount, 'percent off plants only').toBe(roundCents(cartBody.subtotal * 0.1));
 
-    await page.getByRole('link', { name: 'Go to checkout' }).click();
+    let checkout = await cart.goToCheckout();
     await expect(page).toHaveURL(/\/checkout/);
-    await expect(page.getByRole('region', { name: 'Order summary' }).getByText(/Discount \(LEAFY10\)/)).toBeVisible();
+    await expect(checkout.orderSummaryDiscountFor('LEAFY10')).toBeVisible();
 
-    await page.getByLabel('Full name').fill('Ava Green');
-    await page.getByLabel('Street address').fill('12 Fern Lane');
-    await page.getByLabel('City').fill('Portland');
-    await page.getByLabel('Postal code').fill('97201');
-    await page.getByRole('button', { name: 'Place order' }).click();
+    await checkout.fillShippingAddress({
+      fullName: 'Ava Green',
+      street: '12 Fern Lane',
+      city: 'Portland',
+      postalCode: '97201',
+    });
+    const orderDetail = await checkout.placeOrder();
 
     await expect(page).toHaveURL(/\/orders\//, { timeout: 15000 });
-    const paid = page.getByRole('region', { name: 'Paid' });
-    await expect(paid.getByText(/Discount \(LEAFY10\)/)).toBeVisible();
-    await expect(paid.getByText(`−$${cartBody.discount}`)).toBeVisible();
+    await expect(orderDetail.paidDiscountFor('LEAFY10')).toBeVisible();
+    await expect(orderDetail.paidDiscountAmount(`−$${cartBody.discount}`)).toBeVisible();
 
     const emptyCart = await page.request.get(`${apiUrl}/api/cart`, { headers: authHeader });
     expect(emptyCart.ok()).toBeTruthy();
@@ -131,15 +132,16 @@ test.describe('Promo codes journey', () => {
     expect(emptyBody.discount).toBe(0);
 
     await clearCartViaApi(page, token);
-    await page.goto('/plants/pl-pothos');
-    await page.getByRole('button', { name: 'Add to cart' }).click();
-    await expect(page.getByText(/Added .* to your cart/)).toBeVisible();
-    await page.goto('/cart');
-    await applyCodeOnCart(page, 'FREESHIP');
-    await expect(page.getByText(/Code\s+FREESHIP\s+applied/i)).toBeVisible({ timeout: 5000 });
-    await expect(page.getByRole('region', { name: 'Order summary' }).getByText('Free', { exact: true })).toBeVisible();
+    await plant.goto('pl-pothos');
+    await plant.addToCart();
+    await expect(plant.addedToCartToast).toBeVisible();
+    await cart.goto();
+    await cart.applyPromoCode('FREESHIP');
+    await expect(cart.promoAppliedMessage('FREESHIP')).toBeVisible({ timeout: 5000 });
+    await expect(cart.orderSummaryFreeShipping()).toBeVisible();
 
-    await page.getByRole('link', { name: 'Go to checkout' }).click();
-    await expect(page.getByRole('region', { name: 'Order summary' }).getByText('Free', { exact: true })).toBeVisible();
+    checkout = new CheckoutPage(page);
+    await cart.goToCheckout();
+    await expect(checkout.orderSummaryFreeShipping()).toBeVisible();
   });
 });
