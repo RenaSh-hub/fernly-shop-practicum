@@ -181,6 +181,15 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Contradicts:** docs/features/promo-codes.md L14 — "When a code is refused, the message is **announced to screen-reader users** as soon as it appears."; docs/PRODUCT.md L59–61.
 - **Suggested fix:** Wrap the error in `role="alert"` or an `aria-live="assertive"` region.
 
+### F-19: QA report publish smoke probe (P78; close PR without merging)
+
+- **Where:** CI only (`scripts/qa-report.mjs` publish path).
+- **Category:** The contract
+- **Impact:** None — documents that new findings on a PR branch file a `qa-finding` issue once.
+- **Evidence:** This entry exists only on branch `qa-report/smoke-p78`, not on `init`.
+- **Contradicts:** _n/a_
+- **Suggested fix:** Remove this finding and close the smoke PR after verification.
+
 ## Suspicions — not yet tested
 
 Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
