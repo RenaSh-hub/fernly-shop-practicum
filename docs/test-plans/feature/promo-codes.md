@@ -2,9 +2,9 @@
 
 ## Summary
 
-Adds promo codes to the cart: `POST`/`DELETE /api/cart/promo`, cart/order fields `discount` and `promoCode`, percentage and free-shipping codes, and a cart UI (`PromoCodeInput` via the cart-summary slot) that updates `OrderSummary` on cart, checkout, and order pages.
+Adds promo codes to the cart: `POST`/`DELETE /api/cart/promo`, cart and order fields `discount` and `promoCode`, percentage and free-shipping codes, and a cart UI (`PromoCodeInput` via the cart-summary slot) that feeds `OrderSummary` on cart, checkout, and order pages.
 
-Money and sign-in behaviour are covered first. Cases follow `docs/features/promo-codes.md` and `docs/PRODUCT.md`; the product docs win when they disagree with the code.
+Money and sign-in behaviour are covered first. Cases follow `docs/features/promo-codes.md` and `docs/PRODUCT.md`; when they disagree with the code, the docs win.
 
 ## Plan
 
