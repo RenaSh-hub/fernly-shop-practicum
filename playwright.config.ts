@@ -28,6 +28,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { open: 'never' }],
+    ['json', { outputFile: 'reports/playwright.json' }],
     // Playwright does not support per-project reporters in config types; this runs for all projects but only emits when @a11y tests ran.
     [
       './tests/a11y/reporter.ts',

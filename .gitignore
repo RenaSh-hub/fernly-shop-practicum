@@ -4,7 +4,11 @@ dist/
 .DS_Store
 test-results/
 playwright-report/
+reports/
+qa-report/
 a11y-report/
+web/cypress/results/
+cypress/results/
 cypress/videos/
 cypress/screenshots/
 web/cypress/screenshots/
