@@ -209,3 +209,4 @@ Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while m
 Quick API and browser checks that matched PRODUCT.md, so they are lower priority: search ignores case (`MONSTERA`, `FICUS`); Low + Bright light gives 14 = 6 + 8; pet-safe returns only pet-safe plants; 21 plants in pages of 12 and 9; signed-out Add to cart and `/cart` both go to sign-in; a $25 cart charges $6.95 shipping; placing an order empties the cart and lists the order.
 
 <!-- P80 step-3 smoke: FINDINGS-only commit (delete after verify). -->
+<!-- P80 step-3 retry after budget fix -->
