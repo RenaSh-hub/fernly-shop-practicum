@@ -104,7 +104,7 @@ jobs:
         if: steps.budget.outputs.run == 'true'
         run: |
           set -euo pipefail
-          git add -A
+          git add docs/test-plans/
           git diff --cached --binary >"$RUNNER_TEMP/agent.patch"
           chmod +x scripts/agent-guard.sh
           scripts/agent-guard.sh "$RUNNER_TEMP/agent.patch" 'docs/test-plans/*'
@@ -267,7 +267,7 @@ jobs:
       - name: Capture agent patch
         run: |
           set -euo pipefail
-          git add -A
+          git add tests/ web/cypress/ docs/test-plans/ FINDINGS.md
           git diff --cached --binary >"$RUNNER_TEMP/agent.patch"
           chmod +x scripts/agent-guard.sh
           scripts/agent-guard.sh "$RUNNER_TEMP/agent.patch" \
