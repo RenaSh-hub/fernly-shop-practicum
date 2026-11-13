@@ -17,6 +17,10 @@
       {
         "command": "python3 .cursor/hooks/guard-baselines.sh",
         "failClosed": true
+      },
+      {
+        "command": "python3 .cursor/hooks/guard-approvals.sh",
+        "failClosed": true
       }
     ]
   }
