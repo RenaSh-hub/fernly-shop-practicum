@@ -1,0 +1,74 @@
+---
+description: Page objects for Fernly's Playwright end-to-end and visual tests — locators and actions live in tests/pages, specs only describe and assert.
+globs: tests/e2e/**, tests/visual/**, tests/pages/**
+alwaysApply: false
+---
+
+# Fernly Playwright page objects
+
+## Where locators live
+
+Locators belong in `tests/pages/*` as `readonly` fields on a page class. Specs import page objects and call actions; they do not call `page.getByRole`, `page.getByLabel`, or `page.locator` for UI.
+
+```typescript
+// ✅ GOOD — tests/e2e/browse.spec.ts
+const browse = new BrowsePage(page);
+await browse.selectSortByLabel('Price: high to low');
+await expect(browse.plantNameHeadingOnFirstCard(mostExpensive.name)).toBeVisible();
+```
+
+```typescript
+// ❌ BAD — locator in the spec
+await page.getByRole('combobox', { name: 'Sort by' }).selectOption({ label: 'Price: high to low' });
+```
+
+## Locator order (role, label, text)
+
+Prefer `getByRole`, then `getByLabel`, then `getByText`. Do not use CSS selectors or XPath in page objects. Scope with role + name when a control has no label (promo field inside the “Have a promo code?” form).
+
+```typescript
+// ✅ GOOD — tests/pages/CartPage.ts (unnamed field — only textbox on the cart page)
+this.promoCodeInput = page.getByRole('textbox');
+```
+
+```typescript
+// ❌ BAD — tests/e2e/promo-codes.spec.ts (old pattern)
+const input = page.locator('form').filter({ hasText: /Have a promo code/i }).locator('input');
+```
+
+## Actions on page classes
+
+Expose async methods with one-line JSDoc (`@param`, `@returns`). A page object never calls `expect`. Methods return `void`, `this`, or the next page object after navigation.
+
+```typescript
+// ✅ GOOD — tests/pages/CartPage.ts
+async goToCheckout(): Promise<CheckoutPage> {
+  await this.goToCheckoutLink.click();
+  return new CheckoutPage(this.page);
+}
+```
+
+```typescript
+// ❌ BAD — assertion inside a page object
+async applyPromoCode(code: string) {
+  await expect(this.havePromoCodePrompt).toBeVisible();
+  await this.promoCodeInput.fill(code);
+}
+```
+
+## Assertions stay in the spec
+
+Keep every `expect` in `tests/e2e` or `tests/visual`. Specs may use locators from the page object as the subject of assertions.
+
+```typescript
+// ✅ GOOD — tests/e2e/plant-reviews.spec.ts
+await expect(plant.formAlert).toBeVisible();
+await expect(plant.formAlert).toContainText(/already reviewed/i);
+```
+
+```typescript
+// ❌ BAD — hiding an assertion in a “helper” on the page class
+async expectAlreadyReviewedError() {
+  await expect(this.formAlert).toContainText(/already reviewed/i);
+}
+```

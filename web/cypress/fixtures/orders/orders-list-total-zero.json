@@ -1,0 +1,28 @@
+[
+  {
+    "id": "ord-ui-zero-total",
+    "status": "placed",
+    "createdAt": "2026-04-01T08:00:00.000Z",
+    "lines": [
+      {
+        "id": "ln-zero",
+        "plantId": "pl-zero",
+        "name": "Promo Cutting",
+        "size": "S",
+        "unitPrice": 0,
+        "quantity": 1,
+        "lineTotal": 0,
+        "imageUrl": "/plants/succulent.svg"
+      }
+    ],
+    "subtotal": 0,
+    "shipping": 0,
+    "total": 0,
+    "shippingAddress": {
+      "fullName": "Ava Fern",
+      "address": "1 Fern Lane",
+      "city": "Greenfield",
+      "postalCode": "H0H0H0"
+    }
+  }
+]
