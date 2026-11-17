@@ -181,6 +181,42 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Contradicts:** docs/features/promo-codes.md L14 — "When a code is refused, the message is **announced to screen-reader users** as soon as it appears."; docs/PRODUCT.md L59–61.
 - **Suggested fix:** Wrap the error in `role="alert"` or an `aria-live="assertive"` region.
 
+### F-19: Popular ranks by order count, not units sold
+
+- **Where:** `GET /api/popular` (`api/src/features/popular.ts`, `popular()`).
+- **Category:** Business rules in the API
+- **Impact:** Customers see a “most popular” list that treats one workshop tray of 40 cuttings like a single sale, so the wrong plants look trendy.
+- **Evidence:** `tests/api/popular.spec.ts` — **executed**, test **T1: default popular ranks by units sold (workshop tray of 40 counts as 40)** (Expected top `pl-cutting` with **8000** units, Received `pl-monstera` with ~1762).
+- **Contradicts:** docs/features/popular-plants.md L8 — popularity is counted in **units sold, not orders**; OpenAPI `/api/popular` description (units sold in the last 30 days).
+- **Suggested fix:** Add `sale.quantity` (not `1`) when aggregating `unitsSold`.
+
+### F-20: Out-of-stock plants appear in the popular list
+
+- **Where:** `GET /api/popular` (`api/src/features/popular.ts`, `popular()`).
+- **Category:** Business rules in the API
+- **Impact:** Customers are steered toward plants they cannot buy because stock-zero items stay in the ranked list.
+- **Evidence:** `tests/api/popular.spec.ts` — **executed**, test **T2: out-of-stock plants (e.g. pl-pilea) never appear in popular** (`pl-pilea` returned with `stock: 0`); `tests/e2e/popular-plants.spec.ts` — **T7** (popular link to out-of-stock `pl-pilea`).
+- **Contradicts:** docs/features/popular-plants.md L10 — **plants that are out of stock are left out**; OpenAPI `/api/popular` (out-of-stock plants are left out).
+- **Suggested fix:** Omit items with `stock <= 0` before returning the list.
+
+### F-21: Popular and catalog breach the 300 ms p95 SLO at 20 concurrent shoppers
+
+- **Where:** `GET /api/popular` and `GET /api/plants` under mixed browse load (`tests/performance/popular-plants.js`).
+- **Category:** Business rules in the API
+- **Impact:** At busy browsing times, plant pages and the catalog feel sluggish even though the shop promises sub-300 ms responses for most requests.
+- **Evidence:** **executed**, k6 `tests/performance/popular-plants.js` — target **300 ms** p95 (`docs/features/popular-plants.md` L17–18). **One shopper** (smoke, 1 VU): popular p95 **124.97 ms**, catalog p95 **0.73 ms** (within target). **Twenty shoppers** (load, 20 VU): popular p95 **952.71 ms**, catalog p95 **612.82 ms** (threshold fail; `reports/k6/popular-plants-load.md`). **0%** failed requests on popular in that run.
+- **Contradicts:** docs/features/popular-plants.md L17–18 — at ~20 shoppers, **95% of `GET /api/popular` within 300 ms** and **95% of catalog requests within 300 ms** at the same load; OpenAPI `/api/popular` description.
+- **Suggested fix:** Pre-aggregate sales by plant for the 30-day window instead of scanning every sale for every plant on each request.
+
+### F-22: Plant page popular journey still offers out-of-stock links and may keep the current plant linked
+
+- **Where:** Plant page **Popular right now** (`web/src/slots/plant-page/popular.tsx`, `PopularList`); driven by `GET /api/popular`.
+- **Category:** Pages
+- **Impact:** On a real plant page, the first popular link can point at an out-of-stock plant, and after following a link the list may still include the plant now on screen.
+- **Evidence:** `tests/e2e/popular-plants.spec.ts` — **executed**, test **T7: popular list on ≥2 plant pages; link updates list and omits current** (first link `pl-pilea`; after navigation, href still contains `/plants/pl-pilea` while that plant is current). Related API evidence: **F-20**.
+- **Contradicts:** docs/features/popular-plants.md L7, L10 — four in-stock plants, current plant left out, out-of-stock not offered.
+- **Suggested fix:** Fix popular API stock filtering (**F-20**); ensure the slot passes the routed plant id into `PopularList` on every navigation.
+
 ## Suspicions — not yet tested
 
 Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
