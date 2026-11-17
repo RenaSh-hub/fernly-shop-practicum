@@ -1,0 +1,18 @@
+{
+  "id": "pl-snake",
+  "name": "Snake Plant",
+  "latinName": "Dracaena trifasciata",
+  "price": 22,
+  "light": "low",
+  "careLevel": 1,
+  "petSafe": false,
+  "stock": 8,
+  "rating": 4.5,
+  "imageUrl": "/plants/snake.svg",
+  "description": "Upright leaves that forgive missed waterings.",
+  "sizes": [
+    { "label": "S", "priceDelta": 0 },
+    { "label": "M", "priceDelta": 6 }
+  ],
+  "similar": ["pl-sim-a", "pl-sim-b"]
+}

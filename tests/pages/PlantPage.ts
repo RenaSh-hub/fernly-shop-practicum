@@ -11,6 +11,9 @@ export class PlantPage {
   readonly addedToCartToast: Locator;
   readonly thanksForReviewToast: Locator;
   readonly formAlert: Locator;
+  readonly popularSection: Locator;
+  readonly popularHeading: Locator;
+  readonly popularLinks: Locator;
 
   constructor(private readonly page: Page) {
     this.reviewsHeading = page.getByRole('heading', { level: 2, name: 'Reviews' });
@@ -23,6 +26,9 @@ export class PlantPage {
     this.addedToCartToast = page.getByText(/Added .* to your cart/);
     this.thanksForReviewToast = page.getByText('Thanks for your review!');
     this.formAlert = page.getByRole('alert');
+    this.popularSection = page.getByRole('region', { name: 'Popular right now' });
+    this.popularHeading = page.getByRole('heading', { level: 2, name: 'Popular right now' });
+    this.popularLinks = this.popularSection.getByRole('link');
   }
 
   /**

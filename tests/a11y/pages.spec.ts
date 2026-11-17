@@ -42,6 +42,18 @@ test('Plant (/plants/pl-monstera)', { tag: '@a11y' }, async ({ page }, testInfo)
   expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
 });
 
+test('T8: Plant with Popular right now visible (/plants/pl-monstera)', { tag: ['@a11y', '@known-bug'] }, async ({
+  page,
+}, testInfo) => {
+  test.fail(true, 'FINDING-12 / FINDING-13: PriceTag contrast and hero image-alt on plant page');
+  await page.goto('/plants/pl-monstera');
+  await expect(page.getByRole('heading', { level: 2, name: 'Popular right now' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Popular right now' }).getByRole('link').first()).toBeVisible();
+  await expect(page.getByText(/sold this month/).first()).toBeVisible();
+  const { blocking } = await scanPage(page, testInfo, { name: 'Plant' });
+  expect(blocking, formatBlockingMessage(blocking)).toEqual([]);
+});
+
 test('Plant Reviews signed-out (/plants/pl-snake)', { tag: '@a11y' }, async ({ page }, testInfo) => {
   await page.goto('/plants/pl-snake');
   await expect(page.getByRole('heading', { level: 2, name: 'Reviews' })).toBeVisible();
