@@ -251,6 +251,8 @@ jobs:
             echo "Write results to \`docs/test-plans/${PR_HEAD_REF}-results.md\` and put only the results summary in your final message."
           } >"$RUNNER_TEMP/tests-prompt.md"
 
+      - uses: grafana/setup-k6-action@v1
+
       - name: Run tests agent
         timeout-minutes: 40
         env:
