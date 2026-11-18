@@ -10,6 +10,7 @@ const apiUrl = process.env.API_URL ?? 'http://localhost:8100';
 const webUrl = process.env.WEB_URL ?? 'http://localhost:5173';
 const isCI = !!process.env.CI;
 const includeVisual = !!(process.env.CI || process.env.VISUAL);
+const includeHelper = process.env.npm_lifecycle_event === 'test:helper';
 
 export default defineConfig({
   testDir: './tests',
@@ -94,6 +95,17 @@ export default defineConfig({
               baseURL: webUrl,
               viewport: { width: 1280, height: 800 },
             },
+          },
+        ]
+      : []),
+    ...(includeHelper
+      ? [
+          {
+            name: 'helper',
+            testDir: './tests/helper',
+            testMatch: /.*\.spec\.ts/,
+            dependencies: ['setup'],
+            use: { baseURL: webUrl },
           },
         ]
       : []),
