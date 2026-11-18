@@ -1,0 +1,28 @@
+[
+  {
+    "id": "ord-ui-long-id-Supercalifragilisticexpialidocious-Collector-Order-Identifier-That-Must-Wrap-In-The-Link-Text-Without-Overflow",
+    "status": "placed",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "lines": [
+      {
+        "id": "ln-long",
+        "plantId": "pl-long",
+        "name": "Boston Fern",
+        "size": "S",
+        "unitPrice": 18,
+        "quantity": 1,
+        "lineTotal": 18,
+        "imageUrl": "/plants/fern.svg"
+      }
+    ],
+    "subtotal": 18,
+    "shipping": 6.95,
+    "total": 24.95,
+    "shippingAddress": {
+      "fullName": "Ava Fern",
+      "address": "1 Fern Lane",
+      "city": "Greenfield",
+      "postalCode": "H0H0H0"
+    }
+  }
+]

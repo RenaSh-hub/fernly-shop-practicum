@@ -1,0 +1,19 @@
+{
+  "lines": [
+    {
+      "id": "line-ui-zero",
+      "plantId": "pl-ui-zero",
+      "name": "Promo Cutting",
+      "size": "S",
+      "unitPrice": 0,
+      "quantity": 1,
+      "lineTotal": 0,
+      "stock": 10,
+      "imageUrl": "/plants/succulent.svg"
+    }
+  ],
+  "itemCount": 1,
+  "subtotal": 0,
+  "shipping": 6.95,
+  "total": 6.95
+}

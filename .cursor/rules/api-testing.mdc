@@ -1,0 +1,69 @@
+---
+description: How we test the Fernly API with Playwright — oracle sources, black-box HTTP, schema checks, tags, evidence (adapted from P2P api-testing).
+globs: tests/**
+alwaysApply: false
+---
+
+# Fernly API testing (Playwright)
+
+`docs/PRODUCT.md` and `GET /openapi.json` are the oracle for this repo. Tests call HTTP only, through Playwright's `request` fixture (API tests) or the browser (e2e).
+
+## 1. Oracle
+
+- **Product:** [docs/PRODUCT.md](mdc:docs/PRODUCT.md) — what the shop promises customers.
+- **Contract:** the running API's OpenAPI at `{API_URL}/openapi.json` (Swagger UI at `{API_URL}/docs`).
+
+If the running API or UI disagrees with `PRODUCT.md` or `/openapi.json`, keep the documented expectation and **do not change production code** (`api/src`, `web/src`) just to turn tests green in this practicum — record the gap in `FINDINGS.md` with the failing test as evidence. Do not weaken assertions to match bugs.
+
+```typescript
+// ✅ GOOD — PRODUCT.md says price-desc = most expensive first; API returns ascending → fail and file a finding
+expect(body.items[0].price).toBeGreaterThanOrEqual(body.items[1].price);
+
+// ❌ BAD — rewritten to match wrong API order
+expect(body.items[0].price).toBeLessThanOrEqual(body.items[1].price);
+```
+
+## 2. Black box
+
+API tests do **not** import application code. Never `import` from `api/src` or `web/src` into Playwright specs.
+
+```typescript
+// ✅ GOOD
+const res = await request.get('/api/plants');
+
+// ❌ BAD
+import { createApp } from '../../api/src/app.js';
+```
+
+## 3. Requests
+
+Use Playwright's `request` fixture with **path-only** URLs. Host and port come from `baseURL` in [playwright.config.ts](mdc:playwright.config.ts), driven by `API_URL` / `WEB_URL` from [.env](mdc:.env.example).
+
+```typescript
+// ✅ GOOD
+await request.get('/api/plants');
+
+// ❌ BAD
+await request.get('http://localhost:8100/api/plants');
+```
+
+## 4. Data
+
+Do **not** call `POST /api/admin/reset` inside a test — only [tests/reset.setup.ts](mdc:tests/reset.setup.ts) runs reset once per Playwright run. Prefer assertions that do not depend on another spec's mutations unless they are steps in one serial `@e2e` flow.
+
+## 5. Assertions and schema
+
+Assert status when it matters. Validate response bodies with `expectSchema` from [tests/helpers/schema.ts](mdc:tests/helpers/schema.ts) against the OpenAPI component name (same pattern as [RenaSh-hub/p2p-api-practicum](https://github.com/RenaSh-hub/p2p-api-practicum)):
+
+```typescript
+const body = await res.json();
+await expectSchema(request, body, 'Plant');
+```
+
+## 6. Tags
+
+Exactly one tag per test: `{ tag: '@api' }` for HTTP API specs, `{ tag: '@e2e' }` for browser flows. Put the tag on `test()`, not on `describe()`.
+
+## 7. Evidence
+
+Label behavioral claims in findings or reviews: **executed** (this run), **inspected only** (docs/OpenAPI only), or **not yet tested**.

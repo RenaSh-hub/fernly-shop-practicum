@@ -1,0 +1,61 @@
+name: Visual baselines
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: Why these screenshot baselines should change
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Update visual snapshots
+        run: npx playwright test --project=visual --update-snapshots=all
+
+      - name: Commit baselines on a new branch
+        env:
+          REASON: ${{ inputs.reason }}
+          SOURCE_BRANCH: ${{ github.ref_name }}
+          NEW_BRANCH: visual-baselines/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain -- tests/visual)" ]; then
+            echo "No files under tests/visual changed; nothing to commit." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$NEW_BRANCH"
+          git add -- tests/visual
+          git commit -m "Visual baselines: ${REASON}"
+          git push origin "HEAD:refs/heads/${NEW_BRANCH}"
+
+          compare="${SOURCE_BRANCH}...${NEW_BRANCH}"
+          url="${{ github.server_url }}/${{ github.repository }}/compare/${compare}"
+          {
+            echo "Compare: [${compare}](${url})"
+          } >> "$GITHUB_STEP_SUMMARY"

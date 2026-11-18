@@ -1,0 +1,28 @@
+{
+  "id": "ord-ui-no-promo",
+  "status": "placed",
+  "createdAt": "2026-11-06T14:00:00.000Z",
+  "lines": [
+    {
+      "id": "ln-nopromo-a",
+      "plantId": "pl-ui-a",
+      "name": "Monstera Deliciosa",
+      "size": "M",
+      "unitPrice": 25,
+      "quantity": 1,
+      "lineTotal": 25,
+      "imageUrl": "/plants/monstera.svg"
+    }
+  ],
+  "subtotal": 25,
+  "discount": 0,
+  "promoCode": null,
+  "shipping": 6.95,
+  "total": 31.95,
+  "shippingAddress": {
+    "fullName": "Ava Fern",
+    "address": "1 Fern Lane",
+    "city": "Greenfield",
+    "postalCode": "H0H0H0"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "id": "pl-long-name",
+      "name": "Supercalifragilisticexpialidocious Window Fern With An Exceptionally Long Common Name That Must Wrap",
+      "latinName": "Nephrolepis exaltata",
+      "price": 18.5,
+      "light": "medium",
+      "careLevel": 1,
+      "petSafe": true,
+      "stock": 5,
+      "rating": 4.2,
+      "imageUrl": "/plants/fern.svg"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 12
+}

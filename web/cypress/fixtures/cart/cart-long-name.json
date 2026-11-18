@@ -1,0 +1,19 @@
+{
+  "lines": [
+    {
+      "id": "line-ui-long",
+      "plantId": "pl-ui-long",
+      "name": "Supercalifragilisticexpialidocious Window Fern With An Exceptionally Long Common Name That Must Wrap",
+      "size": "S",
+      "unitPrice": 12.5,
+      "quantity": 1,
+      "lineTotal": 12.5,
+      "stock": 5,
+      "imageUrl": "/plants/fern.svg"
+    }
+  ],
+  "itemCount": 1,
+  "subtotal": 12.5,
+  "shipping": 6.95,
+  "total": 19.45
+}

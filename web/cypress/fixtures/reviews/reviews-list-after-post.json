@@ -1,0 +1,28 @@
+{
+  "plantId": "pl-test-detail",
+  "average": 4.8,
+  "count": 3,
+  "reviews": [
+    {
+      "id": "rv-ui-new",
+      "author": "Ava Fern",
+      "rating": 5,
+      "text": "This plant fills the room with jungle vibes.",
+      "createdAt": "2026-11-10T12:00:00.000Z"
+    },
+    {
+      "id": "rv-ui-ava",
+      "author": "Ava",
+      "rating": 5,
+      "text": "Thriving on my bright windowsill after two months.",
+      "createdAt": "2026-10-01T12:00:00.000Z"
+    },
+    {
+      "id": "rv-ui-ben",
+      "author": "Ben",
+      "rating": 4,
+      "text": "Happy plant with only a little leaf tip browning.",
+      "createdAt": "2026-09-15T12:00:00.000Z"
+    }
+  ]
+}

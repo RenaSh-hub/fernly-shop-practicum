@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "id": "pl-free-cutting",
+      "name": "Succulent Cutting",
+      "latinName": "Assorted succulent",
+      "price": 0,
+      "light": "bright",
+      "careLevel": 1,
+      "petSafe": true,
+      "stock": 40,
+      "rating": 4.0,
+      "imageUrl": "/plants/succulent.svg"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 12
+}

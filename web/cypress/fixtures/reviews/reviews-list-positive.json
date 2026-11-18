@@ -1,0 +1,21 @@
+{
+  "plantId": "pl-test-detail",
+  "average": 4.7,
+  "count": 2,
+  "reviews": [
+    {
+      "id": "rv-ui-ava",
+      "author": "Ava",
+      "rating": 5,
+      "text": "Thriving on my bright windowsill after two months.",
+      "createdAt": "2026-10-01T12:00:00.000Z"
+    },
+    {
+      "id": "rv-ui-ben",
+      "author": "Ben",
+      "rating": 4,
+      "text": "Happy plant with only a little leaf tip browning.",
+      "createdAt": "2026-09-15T12:00:00.000Z"
+    }
+  ]
+}
