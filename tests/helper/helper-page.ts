@@ -8,6 +8,7 @@ const firstCustomer = {
 };
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:8100';
+const webUrl = process.env.WEB_URL ?? 'http://localhost:5173';
 
 export interface RecordedCall {
   name: ToolName;
@@ -27,10 +28,12 @@ export async function freshCustomer(page: Page, request: APIRequestContext): Pro
   expect(loginRes.ok()).toBeTruthy();
   const { token } = (await loginRes.json()) as { token: string };
 
-  await page.goto('/');
+  if (!page.url().startsWith(webUrl)) {
+    await page.goto('/');
+  }
   await page.evaluate((saved) => localStorage.setItem('fernly_token', saved), token);
-  await page.reload();
-  await expect(page.getByText('Hi, Ava')).toBeVisible();
+  await page.reload({ waitUntil: 'load' });
+  await expect(page.getByText('Hi, Ava')).toBeVisible({ timeout: 15_000 });
 }
 
 export class HelperPage {

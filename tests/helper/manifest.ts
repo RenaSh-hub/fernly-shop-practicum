@@ -10,7 +10,7 @@ export interface ResultEntry {
   example: string;
   then: string;
   result: 'pass' | 'fail' | 'judge' | 'skip';
-  passRate?: number;
+  passRate?: string;
   evidence: string;
 }
 
