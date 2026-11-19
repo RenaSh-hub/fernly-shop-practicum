@@ -19,6 +19,8 @@
     "cy:ui": "cypress run --e2e --project web",
     "cy:open": "cypress open --project web",
     "test:pw": "playwright test",
+    "test:helper": "playwright test --project=helper --workers=1",
+    "helper:report": "node tests/helper/helper-report.mjs",
     "perf:smoke": "node scripts/perf-run.mjs smoke",
     "perf:load": "node scripts/perf-run.mjs load"
   },

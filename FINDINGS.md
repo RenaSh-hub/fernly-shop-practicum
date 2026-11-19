@@ -181,6 +181,93 @@ The page, component and API map is in [docs/APP-MAP.md](docs/APP-MAP.md).
 - **Contradicts:** docs/features/promo-codes.md L14 — "When a code is refused, the message is **announced to screen-reader users** as soon as it appears."; docs/PRODUCT.md L59–61.
 - **Suggested fix:** Wrap the error in `role="alert"` or an `aria-live="assertive"` region.
 
+<!-- helper-findings-sync-start -->
+
+_Helper **F-19+** below are rewritten by `npm run helper:report` from tier JSON (last sync 2026-11-19T02:32:07Z). Edit catalog in `tests/helper/helper-report.mjs`._
+
+### F-19: Helper add does not refresh the header cart count
+
+- **Where:** `HelperWidget` (`web/src/components/HelperWidget.tsx`); cart link in `Layout.tsx`.
+- **Category:** Pages
+- **Impact:** After the helper adds to the cart, the header still reads **Cart** with no item count until the customer reloads or visits the cart.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the code** (8 examples: add two Monstera Deliciosa to my cart; add 2 Snake Plants; I'd like a pair of Boston Ferns; add three medium Rubber Plants…) Latest — Tier A: expect(locator).toContainText(expected) failed Locator: getByRole('link', { name: /Cart/ }) Expected substring: "2" Received string: "Cart" Timeout: 5000ms Call log: - Expect "toContainText" getByRole… Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L14, L21–22 — `add_to_cart` updates **the cart count in the header right away**.
+- **Suggested fix (optional):** Invalidate `queryKey: ['cart']` (match `useCart()` in `queries.ts`) after a successful helper add.
+
+### F-20: Helper `add_to_cart` always posts size S to the API
+
+- **Where:** `HelperWidget.run` (`web/src/components/HelperWidget.tsx`).
+- **Category:** Business rules in the API
+- **Impact:** Customers who ask for medium or large sizes get small lines, wrong prices, and wrong stock checks.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the code** (4 examples: add three medium Rubber Plants; put 4 Spider Plants in size M in my cart; add one large Bird of Paradise; add 5 ZZ Plants, size L) Latest — Tier A: expect(locator).toContainText(expected) failed Locator: getByRole('listitem').filter({ hasText: 'Rubber Plant' }) Expected substring: "Size M" Received string: "Rubber PlantSize S · Price each: $29.99… Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L13–14, L18 — `add_to_cart` takes `size` (`S`, `M`, `L`) and adds **that size** to the cart.
+- **Suggested fix (optional):** Pass `String(args.size ?? 'S')` from the tool args into the cart line POST (remove hard-coded `size: 'S'`).
+
+### F-21: Casual quantities and adds are wrong too often from natural phrasing
+
+- **Where:** `POST /api/helper/chat` (`api/src/features/helper.ts`); `add_to_cart` tool args.
+- **Category:** Business rules in the API
+- **Impact:** “Two”, “a pair”, “three …”, and similar phrasing do not meet the **9/10** bar for quantity and cart outcomes.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the understanding** (5 examples: add two Monstera Deliciosa to my cart; I'd like a pair of Boston Ferns; add three medium Rubber Plants; add a pair of small Parlor Palms…) Latest — Tier B: 7/10; calls: {"name":"add_to_cart","args":{"plantId":"pl-monstera","size":"S","quantity":1}} | {"name":"add_to_cart","args":{"plantId":"pl-monstera","size":"S","quantity":2}} Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L18, L23 — numbers and sizes as said; **at least 9 times out of 10** reliability.
+- **Suggested fix (optional):** Improve quantity/size parsing in the helper stand-in; lock flaky phrases with `HELPER_SEED` regression.
+
+### F-22: Some pet-safe phrasings never apply the pet-safe filter
+
+- **Where:** `POST /api/helper/chat` → `search_plants`; catalog navigation in `HelperWidget`.
+- **Category:** Business rules in the API
+- **Impact:** Customers asking in their own words for pet-safe plants may see the full catalog or get no search at all.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the understanding** (3 examples: I want something safe for my cat; any plants that are safe for dogs?; pet-friendly plants please) Latest — Tier B: 0/10; calls: (no model call) Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L19, L23 — pet-safe however it’s said; 9/10 reliability.
+- **Suggested fix (optional):** Map cat/dog/pet-friendly paraphrases to `search_plants` with `petSafe: true` consistently.
+
+### F-23: Care questions often pick the wrong tool or miss the data bar
+
+- **Where:** `POST /api/helper/chat` (helper stand-in).
+- **Category:** Business rules in the API
+- **Impact:** Pet and light questions may call `open_plant` or `search_plants` instead of `care_tip`, or fail Tier B’s shop-data bar.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the understanding** (6 examples: can my dog chew on a Spider Plant?; is the Calathea Orbifolia okay around pets?; will a Fiddle Leaf Fig survive in a dark room?; is the Peace Lily toxic to cats?…) Latest — Tier B: 0/10; calls: {"name":"open_plant","args":{"plantId":"pl-spider"}} Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L14, L22 — `care_tip` answers from the shop’s data for pets/light/care.
+- **Suggested fix (optional):** Route care intents to `care_tip` with the right `plantId` and `topic`.
+
+### F-24: Helper claims “Added” or omits refusal when stock blocks the add
+
+- **Where:** `POST /api/helper/chat` reply text; cart POST in `HelperWidget`.
+- **Category:** Business rules in the API
+- **Impact:** Customers believe an out-of-stock add succeeded; the helper does not explain refusal or stock limits in the chat.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the understanding** (4 examples: add five Fiddle Leaf Figs; add a pair of String of Pearls; add 4 medium Hoya Carnosa; add one Chinese Money Plant) Latest — Tier B: 0/10 Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L20 — never says **Added** for something that isn’t in the cart; says so and why when the shop refuses.
+- **Suggested fix (optional):** Base reply copy on cart API outcome; surface stock refusal from the POST `/cart/lines` error.
+
+### F-25: Off-catalog plants get a capability blurb, not “we don’t sell that”
+
+- **Where:** `POST /api/helper/chat` replies.
+- **Category:** Business rules in the API
+- **Impact:** Customers asking about plants Fernly does not sell get the generic helper intro instead of an honest not-sold answer.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the answer** (3 examples: how much is a Venus Flytrap?; how much light does an Olive Tree need?; is a Juniper Bonsai easy to care for?) Latest — Tier C: "Helper: Hi! I can find plants, open a plant page, add plants to your cart and answer care questions. You: how much is a Venus Flytrap? Helper: I can find plants, open a plant page, add plants to your… Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L22 — says the shop doesn’t sell it; never invents a product or price.
+- **Suggested fix (optional):** Detect unknown catalog plants and reply that Fernly does not sell them (no price).
+
+### F-26: Helper invents an off-catalog plant and names a price
+
+- **Where:** `POST /api/helper/chat` replies.
+- **Category:** Business rules in the API
+- **Impact:** Off-catalog asks may receive a dollar price for a plant that is not in the shop.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the answer** (1 examples: do you have Dragon Fruit Cactus?) Latest — Tier C: "Helper: Hi! I can find plants, open a plant page, add plants to your cart and answer care questions. You: do you have Dragon Fruit Cactus? Helper: Yes! Our Dragon is $24 and loves bright, indirect li… Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L22 — never invents a product or a price.
+- **Suggested fix (optional):** Refuse to price or stock plants that are not in `GET /api/plants`.
+
+### F-27: Cart or chat disagrees with a refused add (Tier C)
+
+- **Where:** Helper chat + cart state (`HelperWidget`, cart API).
+- **Category:** Pages
+- **Impact:** A refused add may still show product lines in the cart or “Added” wording only the judge catches.
+- **Evidence:** `tests/helper/helper.feature` — **executed**, `npm run helper:report` → **the answer** (1 examples: add a pair of String of Pearls) Latest — Tier C: Cart still lists String of Pearls. Artifacts: `helper-results/summary.md`, `helper-results/tier-{a,b,c}/`.
+- **Contradicts:** docs/features/fernly-helper.md L20 — never claims an add the shop did not complete; cart should match what the shop accepted.
+- **Suggested fix (optional):** Reconcile cart UI with API after failed or partial adds; align reply when stock blocks the request.
+
+<!-- helper-findings-sync-end -->
+
 ## Suspicions — not yet tested
 
 Things that look different from [docs/PRODUCT.md](docs/PRODUCT.md), seen while mapping the app (Nov 3, 2026, seed data). Line numbers refer to `docs/PRODUCT.md`. A suspicion is not a finding until a test proves it.
